@@ -26,6 +26,11 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
+    if (!process.env.JWT_SECRET) {
+      console.error('Login error: JWT_SECRET is not configured');
+      return res.status(500).json({ message: 'JWT_SECRET is not configured' });
+    }
+
     const token = jwt.sign(
       { id: user.id, email: user.email, role: role },
       process.env.JWT_SECRET,
@@ -39,7 +44,12 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error' });
+    if (error.code === 'P2021' || error.code === 'P2022') {
+      return res.status(500).json({
+        message: 'Database schema is not initialized. Run Prisma migrations and seed the admin user.',
+      });
+    }
+    res.status(500).json({ message: 'Server error', detail: error.message });
   }
 });
 

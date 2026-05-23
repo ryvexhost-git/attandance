@@ -20,6 +20,8 @@ Optional:
 ```text
 CORS_ORIGIN=https://your-vercel-domain.vercel.app
 VITE_API_URL=/api
+ADMIN_EMAIL=admin@attendance.com
+ADMIN_PASSWORD=replace-before-production
 ```
 
 `VITE_API_URL` can be omitted for the Vercel same-origin deployment because the app defaults to `/api`.
@@ -37,14 +39,16 @@ Install Command: npm install
 
 ## Database Setup
 
-This project uses Prisma with PostgreSQL. After setting `DATABASE_URL`, initialize or sync the database schema:
+This project uses Prisma with PostgreSQL. Vercel runs `prisma migrate deploy` during the build when `VERCEL=1`, then creates the first admin user if it does not exist.
+
+To initialize or sync the database manually from your machine:
 
 ```bash
-npm run db:push
-npm run seed
+set RUN_DB_DEPLOY=1
+npm run build --prefix server
 ```
 
-The seed creates/updates the default admin:
+The seed creates the default admin if no admin exists with that email:
 
 ```text
 Email: admin@attendance.com

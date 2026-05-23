@@ -9,8 +9,8 @@
     "seed": "node prisma/seed.js",
     "migrate": "npx prisma migrate dev",
     "generate": "prisma generate --schema=prisma/schema.prisma",
-    "build": "prisma generate --schema=prisma/schema.prisma",
-    "vercel-build": "prisma generate --schema=prisma/schema.prisma",
+    "build": "prisma generate --schema=prisma/schema.prisma && node scripts/deploy-db.js",
+    "vercel-build": "prisma generate --schema=prisma/schema.prisma && node scripts/deploy-db.js",
     "postinstall": "prisma generate --schema=prisma/schema.prisma"
   },
   "keywords": [],
