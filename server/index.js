@@ -25,6 +25,27 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
 
+app.get('/api/health/db', async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    const adminCount = await prisma.admin.count();
+    res.json({
+      ok: true,
+      database: true,
+      adminCount,
+      hasJwtSecret: Boolean(process.env.JWT_SECRET),
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      database: false,
+      hasJwtSecret: Boolean(process.env.JWT_SECRET),
+      message: error.message,
+      code: error.code,
+    });
+  }
+});
+
 const authRoutes = require('./routes/auth');
 const employeeRoutes = require('./routes/employees');
 const attendanceRoutes = require('./routes/attendance');
