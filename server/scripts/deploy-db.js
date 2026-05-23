@@ -13,6 +13,12 @@ if (!process.env.DATABASE_URL) {
   process.exit(1);
 }
 
+if (!/^postgres(ql)?:\/\//.test(process.env.DATABASE_URL)) {
+  console.warn('Skipping database deploy because DATABASE_URL is not a PostgreSQL connection string.');
+  console.warn('Set DATABASE_URL to a value starting with postgresql:// or postgres://.');
+  process.exit(0);
+}
+
 const serverDir = path.resolve(__dirname, '..');
 
 execFileSync('npx', ['prisma', 'migrate', 'deploy', '--schema=prisma/schema.prisma'], {

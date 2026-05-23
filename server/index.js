@@ -27,6 +27,14 @@ app.get('/api/health', (req, res) => {
 
 app.get('/api/health/db', async (req, res) => {
   try {
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL is not configured.');
+    }
+
+    if (!/^postgres(ql)?:\/\//.test(process.env.DATABASE_URL)) {
+      throw new Error('DATABASE_URL must start with postgresql:// or postgres://.');
+    }
+
     await prisma.$queryRaw`SELECT 1`;
     const adminCount = await prisma.admin.count();
     res.json({
