@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  password    String
+  permissions String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Employee {
+  id            String       @id @default(cuid())
+  email         String       @unique
+  password      String
+  name          String
+  phone         String?
+  dailyWage     Float        @map("daily_wage")
+  hourlyRate    Float        @map("hourly_rate")
+  joiningDate   DateTime     @map("joining_date")
+  status        String       @default("active")
+  profilePhoto  String?      @map("profile_photo")
+  attendance    Attendance[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Attendance {
+  id               String   @id @default(cuid())
+  employeeId       String   @map("employee_id")
+  employee         Employee @relation(fields: [employeeId], references: [id])
+  punchInTime      DateTime @map("punch_in_time")
+  punchOutTime     DateTime? @map("punch_out_time")
+  punchInPhoto     String?  @map("punch_in_photo")
+  punchOutPhoto    String?  @map("punch_out_photo")
+  workHours        Float?   @map("work_hours")
+  dailyWageEarned  Float?   @map("daily_wage_earned")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
