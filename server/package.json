@@ -8,9 +8,9 @@
     "dev": "nodemon index.js",
     "seed": "node prisma/seed.js",
     "migrate": "npx prisma migrate dev",
-    "generate": "npx prisma generate",
-    "build": "npx prisma generate",
-    "postinstall": "npx prisma generate"
+    "generate": "prisma generate --schema=prisma/schema.prisma",
+    "build": "prisma generate --schema=prisma/schema.prisma",
+    "postinstall": "prisma generate --schema=prisma/schema.prisma"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +28,7 @@
     "prisma": "^6.4.1"
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.js",
+    "schema": "prisma/schema.prisma"
   }
 }
