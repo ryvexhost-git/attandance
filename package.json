@@ -1,0 +1,24 @@
+{
+  "name": "attendance-register",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --kill-others --raw \"npm run dev --prefix web\" \"npm run dev --prefix server\"",
+    "build": "npm run build --prefix server && npm run build --prefix web",
+    "start": "npm run start --prefix web",
+    "lint": "npm run lint --prefix web",
+    "seed": "npm run seed --prefix server",
+    "db:push": "npx prisma@6.19.3 db push --schema=server/prisma/schema.prisma",
+    "vercel-build": "npm run build"
+  },
+  "workspaces": [
+    "web",
+    "server"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

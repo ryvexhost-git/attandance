@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.vite/
+web/.vite/
+server/prisma/dev.db
+server/prisma/dev.db-journal
+pocketbase/pb_data/
+pocketbase/pb_data_backup/
+pocketbase/pocketbase.exe
+pocketbase/pocketbase
