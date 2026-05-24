@@ -8,13 +8,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Users, UserPlus, Edit, Trash2, DollarSign, TrendingUp } from 'lucide-react';
+import { Image as ImageIcon, Upload, Users, UserPlus, Edit, Trash2, DollarSign, TrendingUp, X } from 'lucide-react';
 import { toast } from 'sonner';
 import apiClient from '@/lib/apiClient.js';
 import Header from '@/components/Header.jsx';
 
 const AdminDashboard = () => {
   const [employees, setEmployees] = useState([]);
+  const [recentAttendance, setRecentAttendance] = useState([]);
   const [stats, setStats] = useState({ total: 0, active: 0, totalPayroll: 0 });
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -26,12 +27,14 @@ const AdminDashboard = () => {
     dailyWage: '',
     joiningDate: '',
     status: 'active',
-    password: ''
+    password: '',
+    profilePhoto: ''
   });
 
   useEffect(() => {
     loadEmployees();
     loadStats();
+    loadRecentAttendance();
   }, []);
 
   const loadEmployees = async () => {
@@ -66,6 +69,21 @@ const AdminDashboard = () => {
     }
   };
 
+  const loadRecentAttendance = async () => {
+    try {
+      const response = await apiClient.get('/attendance/all');
+      setRecentAttendance(response.data);
+    } catch (error) {
+      console.error('Error loading attendance verification:', error);
+    }
+  };
+
+  const openImage = (photo) => {
+    if (!photo) return;
+    const win = window.open();
+    win.document.write(`<img src="${photo}" style="max-width:100%;height:auto;" />`);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -92,11 +110,59 @@ const AdminDashboard = () => {
       resetForm();
       loadEmployees();
       loadStats();
+      loadRecentAttendance();
     } catch (error) {
       console.error('Error saving employee:', error);
       toast.error(error.response?.data?.message || 'Failed to save employee');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const resizeImageFile = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const img = new Image();
+
+        img.onload = () => {
+          const maxSize = 640;
+          const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/jpeg', 0.82));
+        };
+
+        img.onerror = () => reject(new Error('Unable to read image'));
+        img.src = reader.result;
+      };
+
+      reader.onerror = () => reject(new Error('Unable to read image'));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleProfilePhotoChange = async (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+
+    try {
+      const profilePhoto = await resizeImageFile(file);
+      setFormData({ ...formData, profilePhoto });
+    } catch (error) {
+      console.error('Profile photo error:', error);
+      toast.error('Failed to process profile photo');
     }
   };
 
@@ -108,6 +174,7 @@ const AdminDashboard = () => {
       toast.success('Employee deleted');
       loadEmployees();
       loadStats();
+      loadRecentAttendance();
     } catch (error) {
       console.error('Error deleting employee:', error);
       toast.error('Failed to delete employee');
@@ -123,7 +190,8 @@ const AdminDashboard = () => {
       dailyWage: employee.dailyWage.toString(),
       joiningDate: employee.joiningDate ? employee.joiningDate.split('T')[0] : '',
       status: employee.status,
-      password: ''
+      password: '',
+      profilePhoto: employee.profilePhoto || ''
     });
     setDialogOpen(true);
   };
@@ -137,7 +205,8 @@ const AdminDashboard = () => {
       dailyWage: '',
       joiningDate: '',
       status: 'active',
-      password: ''
+      password: '',
+      profilePhoto: ''
     });
   };
 
@@ -202,7 +271,7 @@ const AdminDashboard = () => {
                       Add Employee
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-md">
+                  <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle>{editingEmployee ? 'Edit Employee' : 'Add New Employee'}</DialogTitle>
                       <DialogDescription>
@@ -288,6 +357,45 @@ const AdminDashboard = () => {
                           className="text-foreground"
                         />
                       </div>
+                      <div className="space-y-3">
+                        <Label htmlFor="profilePhoto">Employee Photo</Label>
+                        <div className="flex items-center gap-4">
+                          <div className="h-20 w-20 overflow-hidden rounded-md border bg-muted flex items-center justify-center">
+                            {formData.profilePhoto ? (
+                              <img src={formData.profilePhoto} alt="Employee" className="h-full w-full object-cover" />
+                            ) : (
+                              <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                            )}
+                          </div>
+                          <div className="flex flex-1 gap-2">
+                            <Label
+                              htmlFor="profilePhoto"
+                              className="inline-flex h-10 cursor-pointer items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+                            >
+                              <Upload className="h-4 w-4 mr-2" />
+                              Upload
+                            </Label>
+                            <Input
+                              id="profilePhoto"
+                              type="file"
+                              accept="image/*"
+                              onChange={handleProfilePhotoChange}
+                              className="hidden"
+                            />
+                            {formData.profilePhoto && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                onClick={() => setFormData({ ...formData, profilePhoto: '' })}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground">Used as the reference photo for punch-in and punch-out verification.</p>
+                      </div>
                       <div className="flex gap-2">
                         <Button type="submit" disabled={loading} className="flex-1">
                           {loading ? 'Saving...' : editingEmployee ? 'Update' : 'Create'}
@@ -321,6 +429,7 @@ const AdminDashboard = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Name</TableHead>
+                        <TableHead>Photo</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Phone</TableHead>
                         <TableHead>Daily Wage</TableHead>
@@ -332,6 +441,15 @@ const AdminDashboard = () => {
                       {employees.map((employee) => (
                         <TableRow key={employee.id}>
                           <TableCell className="font-medium">{employee.name}</TableCell>
+                          <TableCell>
+                            <div className="h-10 w-10 overflow-hidden rounded-md border bg-muted flex items-center justify-center">
+                              {employee.profilePhoto ? (
+                                <img src={employee.profilePhoto} alt={employee.name} className="h-full w-full object-cover" />
+                              ) : (
+                                <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                              )}
+                            </div>
+                          </TableCell>
                           <TableCell>{employee.email}</TableCell>
                           <TableCell>{employee.phone || '-'}</TableCell>
                           <TableCell>${employee.dailyWage?.toFixed(2)}</TableCell>
@@ -349,6 +467,79 @@ const AdminDashboard = () => {
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Photo Verification</CardTitle>
+              <CardDescription>Compare registered employee photos with recent punch selfies</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {recentAttendance.length === 0 ? (
+                <div className="text-center py-8">
+                  <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">No attendance photos yet</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Employee</TableHead>
+                        <TableHead>Reference</TableHead>
+                        <TableHead>Punch In</TableHead>
+                        <TableHead>Punch Out</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {recentAttendance.map((record) => (
+                        <TableRow key={record.id}>
+                          <TableCell>
+                            <div className="font-medium">{record.employee?.name}</div>
+                            <div className="text-xs text-muted-foreground">{record.employee?.email}</div>
+                          </TableCell>
+                          <TableCell>
+                            {record.employee?.profilePhoto ? (
+                              <button onClick={() => openImage(record.employee.profilePhoto)}>
+                                <img src={record.employee.profilePhoto} alt="Reference" className="h-12 w-12 rounded-md object-cover border" />
+                              </button>
+                            ) : (
+                              <Badge variant="secondary">Missing</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {record.punchInPhoto ? (
+                              <button onClick={() => openImage(record.punchInPhoto)}>
+                                <img src={record.punchInPhoto} alt="Punch in" className="h-12 w-12 rounded-md object-cover border" />
+                              </button>
+                            ) : (
+                              '-'
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {record.punchOutPhoto ? (
+                              <button onClick={() => openImage(record.punchOutPhoto)}>
+                                <img src={record.punchOutPhoto} alt="Punch out" className="h-12 w-12 rounded-md object-cover border" />
+                              </button>
+                            ) : (
+                              '-'
+                            )}
+                          </TableCell>
+                          <TableCell>{new Date(record.punchInTime).toLocaleString()}</TableCell>
+                          <TableCell>
+                            <Badge variant={record.punchOutTime ? 'default' : 'secondary'}>
+                              {record.punchOutTime ? 'Completed' : 'Active'}
+                            </Badge>
                           </TableCell>
                         </TableRow>
                       ))}

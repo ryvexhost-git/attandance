@@ -70,6 +70,7 @@ async function initializeDatabase(prisma) {
 
   await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "Admin_email_key" ON "Admin"("email");');
   await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "Employee_email_key" ON "Employee"("email");');
+  await prisma.$executeRawUnsafe('ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "profile_photo" TEXT;');
 
   await prisma.$executeRawUnsafe(`
     DO $$

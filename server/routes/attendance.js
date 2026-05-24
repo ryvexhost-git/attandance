@@ -1,13 +1,42 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
-const { auth } = require('../middleware/auth');
+const { auth, adminOnly } = require('../middleware/auth');
+const { ensureDatabase } = require('../lib/ensureDatabase');
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
+// Get all attendance records for verification (Admin only)
+router.get('/all', auth, adminOnly, async (req, res) => {
+  try {
+    await ensureDatabase(prisma);
+
+    const records = await prisma.attendance.findMany({
+      include: {
+        employee: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profilePhoto: true
+          }
+        }
+      },
+      orderBy: { punchInTime: 'desc' },
+      take: 50
+    });
+
+    res.json(records);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Get personal attendance records
 router.get('/my', auth, async (req, res) => {
   try {
+    await ensureDatabase(prisma);
+
     const records = await prisma.attendance.findMany({
       where: { employeeId: req.user.id },
       orderBy: { punchInTime: 'desc' }
@@ -22,6 +51,18 @@ router.get('/my', auth, async (req, res) => {
 router.post('/punch-in', auth, async (req, res) => {
   const { photo } = req.body;
   try {
+    await ensureDatabase(prisma);
+
+    const employee = await prisma.employee.findUnique({ where: { id: req.user.id } });
+
+    if (!employee?.profilePhoto) {
+      return res.status(400).json({ message: 'Profile photo is required before punching in. Please contact admin.' });
+    }
+
+    if (!photo) {
+      return res.status(400).json({ message: 'Selfie photo is required for punch in' });
+    }
+
     const record = await prisma.attendance.create({
       data: {
         employeeId: req.user.id,
@@ -39,6 +80,12 @@ router.post('/punch-in', auth, async (req, res) => {
 router.post('/punch-out/:id', auth, async (req, res) => {
   const { photo } = req.body;
   try {
+    await ensureDatabase(prisma);
+
+    if (!photo) {
+      return res.status(400).json({ message: 'Selfie photo is required for punch out' });
+    }
+
     const punchInRecord = await prisma.attendance.findUnique({
       where: { id: req.params.id },
       include: { employee: true }

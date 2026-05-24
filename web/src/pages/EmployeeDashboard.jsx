@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Camera, Clock, DollarSign, Calendar, TrendingUp } from 'lucide-react';
+import { Camera, Clock, DollarSign, Calendar, TrendingUp, User } from 'lucide-react';
 import { toast } from 'sonner';
 import apiClient from '@/lib/apiClient.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
@@ -135,6 +135,19 @@ const EmployeeDashboard = () => {
                 <CardDescription>Your account information</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
+                <div className="flex items-center gap-4 pb-3">
+                  <div className="h-20 w-20 overflow-hidden rounded-md border bg-muted flex items-center justify-center">
+                    {currentUser?.profilePhoto ? (
+                      <img src={currentUser.profilePhoto} alt={currentUser?.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <User className="h-8 w-8 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">{currentUser?.name}</p>
+                    <p className="text-sm text-muted-foreground">Verification reference photo</p>
+                  </div>
+                </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Employee ID</span>
                   <span className="font-medium">{currentUser?.id}</span>

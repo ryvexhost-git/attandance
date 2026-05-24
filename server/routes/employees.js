@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const { PrismaClient } = require('@prisma/client');
 const { auth, adminOnly } = require('../middleware/auth');
+const { ensureDatabase } = require('../lib/ensureDatabase');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -9,6 +10,8 @@ const prisma = new PrismaClient();
 // Get all employees (Admin only)
 router.get('/', auth, adminOnly, async (req, res) => {
   try {
+    await ensureDatabase(prisma);
+
     const employees = await prisma.employee.findMany({
       orderBy: { joiningDate: 'desc' }
     });
@@ -20,9 +23,11 @@ router.get('/', auth, adminOnly, async (req, res) => {
 
 // Create employee (Admin only)
 router.post('/', auth, adminOnly, async (req, res) => {
-  const { name, email, password, phone, dailyWage, joiningDate, status } = req.body;
+  const { name, email, password, phone, dailyWage, joiningDate, status, profilePhoto } = req.body;
 
   try {
+    await ensureDatabase(prisma);
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     const hourlyRate = dailyWage / 8;
@@ -36,7 +41,8 @@ router.post('/', auth, adminOnly, async (req, res) => {
         dailyWage,
         hourlyRate,
         joiningDate: new Date(joiningDate),
-        status
+        status,
+        profilePhoto
       }
     });
 
@@ -52,9 +58,11 @@ router.post('/', auth, adminOnly, async (req, res) => {
 
 // Update employee (Admin only)
 router.put('/:id', auth, adminOnly, async (req, res) => {
-  const { name, email, phone, dailyWage, joiningDate, status, password } = req.body;
+  const { name, email, phone, dailyWage, joiningDate, status, password, profilePhoto } = req.body;
 
   try {
+    await ensureDatabase(prisma);
+
     const updateData = {
       name,
       email,
@@ -62,7 +70,8 @@ router.put('/:id', auth, adminOnly, async (req, res) => {
       dailyWage,
       hourlyRate: dailyWage / 8,
       joiningDate: new Date(joiningDate),
-      status
+      status,
+      profilePhoto
     };
 
     if (password) {
@@ -85,6 +94,8 @@ router.put('/:id', auth, adminOnly, async (req, res) => {
 // Delete employee (Admin only)
 router.delete('/:id', auth, adminOnly, async (req, res) => {
   try {
+    await ensureDatabase(prisma);
+
     await prisma.employee.delete({ where: { id: req.params.id } });
     res.json({ message: 'Employee deleted' });
   } catch (error) {

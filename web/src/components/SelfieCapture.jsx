@@ -102,6 +102,20 @@ const SelfieCapture = ({ onSuccess, onCancel }) => {
         </Button>
       </CardHeader>
       <CardContent className="space-y-4 pt-4">
+        {currentUser?.profilePhoto && (
+          <div className="flex items-center gap-3 rounded-lg border bg-muted/40 p-3">
+            <img
+              src={currentUser.profilePhoto}
+              alt="Registered employee"
+              className="h-16 w-16 rounded-md object-cover"
+            />
+            <div>
+              <p className="text-sm font-medium text-foreground">Registered photo</p>
+              <p className="text-xs text-muted-foreground">Match your selfie with this reference before confirming.</p>
+            </div>
+          </div>
+        )}
+
         <div className="relative aspect-video bg-muted rounded-xl overflow-hidden border-2 border-muted shadow-inner">
           {cameraError ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">

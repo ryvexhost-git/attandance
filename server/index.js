@@ -14,7 +14,7 @@ const allowedOrigins = process.env.CORS_ORIGIN
   : true;
 
 app.use(cors({ origin: allowedOrigins, credentials: true }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 // Routes
 app.get('/', (req, res) => {
