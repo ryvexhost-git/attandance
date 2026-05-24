@@ -271,15 +271,20 @@ const AdminDashboard = () => {
                       Add Employee
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>{editingEmployee ? 'Edit Employee' : 'Add New Employee'}</DialogTitle>
+                  <DialogContent className="flex h-[96vh] w-[96vw] max-w-5xl flex-col overflow-hidden p-0 sm:rounded-lg">
+                    <DialogHeader className="border-b px-6 py-5">
+                      <DialogTitle className="text-2xl">{editingEmployee ? 'Edit Employee' : 'Add New Employee'}</DialogTitle>
                       <DialogDescription>
-                        {editingEmployee ? 'Update employee information' : 'Create a new employee account'}
+                        {editingEmployee
+                          ? 'Update employee information, payroll details, login access, and verification photo'
+                          : 'Create a complete employee profile with payroll details, login access, and verification photo'}
                       </DialogDescription>
                     </DialogHeader>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                      <div className="space-y-2">
+                    <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+                      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6">
+                        <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+                          <div className="grid gap-6 md:grid-cols-2">
+                            <div className="space-y-2">
                         <Label htmlFor="name">Name</Label>
                         <Input
                           id="name"
@@ -289,7 +294,7 @@ const AdminDashboard = () => {
                           className="text-foreground"
                         />
                       </div>
-                      <div className="space-y-2">
+                            <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>
                         <Input
                           id="email"
@@ -300,7 +305,7 @@ const AdminDashboard = () => {
                           className="text-foreground"
                         />
                       </div>
-                      <div className="space-y-2">
+                            <div className="space-y-2">
                         <Label htmlFor="phone">Phone</Label>
                         <Input
                           id="phone"
@@ -309,7 +314,7 @@ const AdminDashboard = () => {
                           className="text-foreground"
                         />
                       </div>
-                      <div className="space-y-2">
+                            <div className="space-y-2">
                         <Label htmlFor="dailyWage">Daily Wage ($)</Label>
                         <Input
                           id="dailyWage"
@@ -323,7 +328,7 @@ const AdminDashboard = () => {
                         />
                         <p className="text-xs text-muted-foreground">Hourly rate will be calculated as daily wage ÷ 8</p>
                       </div>
-                      <div className="space-y-2">
+                            <div className="space-y-2">
                         <Label htmlFor="joiningDate">Joining Date</Label>
                         <Input
                           id="joiningDate"
@@ -334,7 +339,7 @@ const AdminDashboard = () => {
                           className="text-foreground"
                         />
                       </div>
-                      <div className="space-y-2">
+                            <div className="space-y-2">
                         <Label htmlFor="status">Status</Label>
                         <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
                           <SelectTrigger className="text-foreground">
@@ -346,7 +351,7 @@ const AdminDashboard = () => {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="space-y-2">
+                            <div className="space-y-2 md:col-span-2">
                         <Label htmlFor="password">Password {editingEmployee && '(leave blank to keep current)'}</Label>
                         <Input
                           id="password"
@@ -357,23 +362,26 @@ const AdminDashboard = () => {
                           className="text-foreground"
                         />
                       </div>
-                      <div className="space-y-3">
+                          </div>
+
+                          <div className="space-y-4 rounded-md border bg-muted/30 p-4">
                         <Label htmlFor="profilePhoto">Employee Photo</Label>
                         <div className="flex items-center gap-4">
-                          <div className="h-20 w-20 overflow-hidden rounded-md border bg-muted flex items-center justify-center">
+                          <div className="aspect-square w-full overflow-hidden rounded-md border bg-background flex items-center justify-center">
                             {formData.profilePhoto ? (
                               <img src={formData.profilePhoto} alt="Employee" className="h-full w-full object-cover" />
                             ) : (
-                              <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                              <ImageIcon className="h-14 w-14 text-muted-foreground" />
                             )}
                           </div>
-                          <div className="flex flex-1 gap-2">
+                        </div>
+                          <div className="flex gap-2">
                             <Label
                               htmlFor="profilePhoto"
                               className="inline-flex h-10 cursor-pointer items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
                             >
                               <Upload className="h-4 w-4 mr-2" />
-                              Upload
+                              Upload Photo
                             </Label>
                             <Input
                               id="profilePhoto"
@@ -393,15 +401,16 @@ const AdminDashboard = () => {
                               </Button>
                             )}
                           </div>
-                        </div>
-                        <p className="text-xs text-muted-foreground">Used as the reference photo for punch-in and punch-out verification.</p>
+                        <p className="text-xs text-muted-foreground">Reference photo for punch-in and punch-out verification.</p>
                       </div>
-                      <div className="flex gap-2">
-                        <Button type="submit" disabled={loading} className="flex-1">
-                          {loading ? 'Saving...' : editingEmployee ? 'Update' : 'Create'}
-                        </Button>
+                        </div>
+                      </div>
+                      <div className="flex flex-col-reverse gap-3 border-t bg-background px-6 py-4 sm:flex-row sm:justify-end">
                         <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                           Cancel
+                        </Button>
+                        <Button type="submit" disabled={loading} className="sm:min-w-32">
+                          {loading ? 'Saving...' : editingEmployee ? 'Update Employee' : 'Create Employee'}
                         </Button>
                       </div>
                     </form>
