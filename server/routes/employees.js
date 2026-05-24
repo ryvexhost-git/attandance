@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const { PrismaClient } = require('@prisma/client');
 const { auth, adminOnly } = require('../middleware/auth');
-const { ensureDatabase } = require('../lib/ensureDatabase');
+const { ensureDatabase, generateEmployeeCode } = require('../lib/ensureDatabase');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -31,16 +31,19 @@ router.post('/', auth, adminOnly, async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     const hourlyRate = dailyWage / 8;
+    const parsedJoiningDate = new Date(joiningDate);
+    const employeeCode = await generateEmployeeCode(prisma, parsedJoiningDate);
 
     const employee = await prisma.employee.create({
       data: {
+        employeeCode,
         name,
         email,
         password: hashedPassword,
         phone,
         dailyWage,
         hourlyRate,
-        joiningDate: new Date(joiningDate),
+        joiningDate: parsedJoiningDate,
         status,
         profilePhoto
       }
@@ -63,16 +66,22 @@ router.put('/:id', auth, adminOnly, async (req, res) => {
   try {
     await ensureDatabase(prisma);
 
+    const existingEmployee = await prisma.employee.findUnique({ where: { id: req.params.id } });
+    const parsedJoiningDate = new Date(joiningDate);
     const updateData = {
       name,
       email,
       phone,
       dailyWage,
       hourlyRate: dailyWage / 8,
-      joiningDate: new Date(joiningDate),
+      joiningDate: parsedJoiningDate,
       status,
       profilePhoto
     };
+
+    if (existingEmployee && existingEmployee.joiningDate.toISOString().split('T')[0] !== joiningDate) {
+      updateData.employeeCode = await generateEmployeeCode(prisma, parsedJoiningDate);
+    }
 
     if (password) {
       const salt = await bcrypt.genSalt(10);

@@ -429,6 +429,7 @@ const AdminDashboard = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Name</TableHead>
+                        <TableHead>Employee ID</TableHead>
                         <TableHead>Photo</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Phone</TableHead>
@@ -441,6 +442,9 @@ const AdminDashboard = () => {
                       {employees.map((employee) => (
                         <TableRow key={employee.id}>
                           <TableCell className="font-medium">{employee.name}</TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">{employee.employeeCode || '-'}</Badge>
+                          </TableCell>
                           <TableCell>
                             <div className="h-10 w-10 overflow-hidden rounded-md border bg-muted flex items-center justify-center">
                               {employee.profilePhoto ? (
@@ -506,7 +510,7 @@ const AdminDashboard = () => {
                         <TableRow key={record.id}>
                           <TableCell>
                             <div className="font-medium">{record.employee?.name}</div>
-                            <div className="text-xs text-muted-foreground">{record.employee?.email}</div>
+                            <div className="text-xs text-muted-foreground">{record.employee?.employeeCode || record.employee?.email}</div>
                           </TableCell>
                           <TableCell>
                             {record.employee?.profilePhoto ? (

@@ -150,7 +150,7 @@ const EmployeeDashboard = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Employee ID</span>
-                  <span className="font-medium">{currentUser?.id}</span>
+                  <span className="font-medium">{currentUser?.employeeCode || currentUser?.id}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Email</span>

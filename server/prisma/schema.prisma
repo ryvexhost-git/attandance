@@ -21,6 +21,7 @@ model Admin {
 
 model Employee {
   id            String       @id @default(cuid())
+  employeeCode  String?      @unique @map("employee_code")
   email         String       @unique
   password      String
   name          String

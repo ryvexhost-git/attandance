@@ -16,6 +16,7 @@ router.get('/all', auth, adminOnly, async (req, res) => {
         employee: {
           select: {
             id: true,
+            employeeCode: true,
             name: true,
             email: true,
             profilePhoto: true
