@@ -271,7 +271,7 @@ const AdminDashboard = () => {
                       Add Employee
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="flex h-[96vh] w-[96vw] max-w-5xl flex-col overflow-hidden p-0 sm:rounded-lg">
+                  <DialogContent className="left-0 top-0 flex h-screen w-screen max-w-none translate-x-0 translate-y-0 flex-col overflow-hidden border-0 p-0 sm:rounded-none">
                     <DialogHeader className="border-b px-6 py-5">
                       <DialogTitle className="text-2xl">{editingEmployee ? 'Edit Employee' : 'Add New Employee'}</DialogTitle>
                       <DialogDescription>
