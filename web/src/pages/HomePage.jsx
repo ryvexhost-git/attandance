@@ -15,8 +15,8 @@ const HomePage = () => {
         <meta name="description" content="Modern attendance tracking and payroll management system with selfie verification" />
       </Helmet>
       <Header />
-      <div className="min-h-screen bg-background">
-        <section className="relative min-h-[90vh] flex items-center justify-center px-4 py-20 bg-gradient-to-b from-primary/5 to-background">
+      <div className="branded-app-shell min-h-screen bg-background">
+        <section className="branded-login-surface relative flex min-h-[90vh] items-center justify-center px-4 py-20">
           <div className="container mx-auto text-center max-w-4xl">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
               <Clock className="h-4 w-4" />
@@ -78,14 +78,22 @@ const HomePage = () => {
                   </li>
                 </ul>
               </div>
-              <div className="bg-muted rounded-2xl p-8 flex items-center justify-center min-h-[300px]">
-                <Camera className="h-32 w-32 text-muted-foreground/30" />
+              <div className="overflow-hidden rounded-2xl border shadow-lg">
+                <img
+                  src="/Mascot_Cafe_Counter_Combo_REFERENCE.jpeg"
+                  alt="Cafe counter"
+                  className="h-[360px] w-full object-cover"
+                />
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-              <div className="order-2 md:order-1 bg-muted rounded-2xl p-8 flex items-center justify-center min-h-[300px]">
-                <Clock className="h-32 w-32 text-muted-foreground/30" />
+              <div className="order-2 overflow-hidden rounded-2xl border shadow-lg md:order-1">
+                <img
+                  src="/Mascot_Bun_Coffee_Combo_Table_REFERENCE.jpeg"
+                  alt="Coffee bun table"
+                  className="h-[360px] w-full object-cover"
+                />
               </div>
               <div className="order-1 md:order-2">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-4">
@@ -136,8 +144,12 @@ const HomePage = () => {
                   </li>
                 </ul>
               </div>
-              <div className="bg-muted rounded-2xl p-8 flex items-center justify-center min-h-[300px]">
-                <DollarSign className="h-32 w-32 text-muted-foreground/30" />
+              <div className="overflow-hidden rounded-2xl border shadow-lg">
+                <img
+                  src="/Mascot_Bun_Coffee_Poster_Text_REFERENCE.jpeg"
+                  alt="Coffee bun poster"
+                  className="h-[360px] w-full object-cover"
+                />
               </div>
             </div>
           </div>
