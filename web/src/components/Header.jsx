@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LogOut, User, LayoutDashboard, Clock, DollarSign, ChevronDown } from 'lucide-react';
+import { Menu, LogOut, User, LayoutDashboard, Clock, DollarSign, ChevronDown, Users } from 'lucide-react';
 
 const Header = () => {
   const { currentUser, userRole, logout, isAuthenticated } = useAuth();
@@ -12,7 +12,8 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const adminLinks = [
-    { to: '/admin-dashboard', label: 'Dashboard', icon: LayoutDashboard }
+    { to: '/admin-dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/admin-employees', label: 'Employees', icon: Users }
   ];
 
   const employeeLinks = [

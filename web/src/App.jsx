@@ -8,6 +8,7 @@ import ProtectedRoute from '@/components/ProtectedRoute.jsx';
 import HomePage from '@/pages/HomePage.jsx';
 import LoginPage from '@/pages/LoginPage.jsx';
 import AdminDashboard from '@/pages/AdminDashboard.jsx';
+import AdminEmployees from '@/pages/AdminEmployees.jsx';
 import EmployeeDashboard from '@/pages/EmployeeDashboard.jsx';
 import AttendanceRecords from '@/pages/AttendanceRecords.jsx';
 import PayrollSummary from '@/pages/PayrollSummary.jsx';
@@ -25,6 +26,14 @@ function App() {
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin-employees"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminEmployees />
               </ProtectedRoute>
             }
           />
