@@ -51,24 +51,32 @@ const LoginPage = () => {
         <meta name="description" content="Login to access your attendance and payroll dashboard" />
       </Helmet>
       <Header />
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-muted/30 px-4 py-12">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Welcome back</CardTitle>
-            <CardDescription>Sign in to your account to continue</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="employee" className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Employee
-                </TabsTrigger>
-                <TabsTrigger value="admin" className="flex items-center gap-2">
-                  <Shield className="h-4 w-4" />
-                  Admin
-                </TabsTrigger>
-              </TabsList>
+      <div className="branded-login-surface min-h-[calc(100vh-4rem)] px-4 py-12">
+        <div className="relative z-10 mx-auto grid min-h-[calc(100vh-10rem)] w-full max-w-6xl items-center gap-10 lg:grid-cols-[1fr_420px]">
+          <div className="hidden max-w-xl lg:block">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-primary">Coffee Bun Team</p>
+            <h1 className="mb-4 text-5xl font-bold leading-tight text-foreground">Attendance made simple for every shift.</h1>
+            <p className="text-lg text-muted-foreground">
+              Sign in to manage punch-in records, payroll, and employee photo verification from one clean console.
+            </p>
+          </div>
+          <Card className="branded-login-panel w-full max-w-md justify-self-center">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl">Welcome back</CardTitle>
+              <CardDescription>Sign in to your account to continue</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="employee" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Employee
+                  </TabsTrigger>
+                  <TabsTrigger value="admin" className="flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    Admin
+                  </TabsTrigger>
+                </TabsList>
 
               <TabsContent value="employee">
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -139,9 +147,10 @@ const LoginPage = () => {
                   </Button>
                 </form>
               </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </>
   );

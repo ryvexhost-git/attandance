@@ -94,6 +94,76 @@ html {
 }
 
 @layer components {
+  .branded-login-surface {
+    position: relative;
+    overflow: hidden;
+    background:
+      linear-gradient(115deg, hsl(var(--background) / 0.94) 0%, hsl(var(--background) / 0.78) 46%, hsl(var(--background) / 0.42) 100%),
+      url("/cbimgback.jpg") center / cover no-repeat;
+  }
+
+  .branded-login-surface::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, hsl(var(--background) / 0.1), hsl(var(--background) / 0.55));
+    pointer-events: none;
+  }
+
+  .branded-login-panel {
+    background-color: hsl(var(--card) / 0.9);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 24px 80px hsl(28 35% 16% / 0.18);
+  }
+
+  .branded-app-shell {
+    position: relative;
+    overflow: hidden;
+    background:
+      linear-gradient(180deg, hsl(var(--background) / 0.95), hsl(var(--background) / 0.9)),
+      url("/Mascot_Pair_Poster_Location_REFERENCE.jpeg") right top / min(38vw, 520px) auto no-repeat,
+      hsl(var(--background));
+  }
+
+  .branded-app-shell::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+      linear-gradient(90deg, hsl(var(--background) / 0.88), hsl(var(--background) / 0.98) 56%),
+      url("/cbimgback.jpg") right center / 680px auto no-repeat;
+    opacity: 0.18;
+    pointer-events: none;
+  }
+
+  .branded-app-shell > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .branded-app-shell .bg-card {
+    background-color: hsl(var(--card) / 0.92);
+    backdrop-filter: blur(12px);
+  }
+
+  .brand-visual-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .brand-visual-card::after {
+    content: "";
+    position: absolute;
+    inset: auto -24px -42px auto;
+    width: 180px;
+    aspect-ratio: 1;
+    background: url("/Mascot_Pair_Clean_Closeup_REFERENCE.jpeg") center / cover no-repeat;
+    border-radius: 999px;
+    opacity: 0.16;
+    pointer-events: none;
+  }
+
   .bg-primary {
     background-color: hsl(var(--primary)) !important;
   }

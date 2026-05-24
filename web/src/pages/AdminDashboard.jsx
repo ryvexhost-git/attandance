@@ -217,7 +217,7 @@ const AdminDashboard = () => {
         <meta name="description" content="Manage employees and view payroll statistics" />
       </Helmet>
       <Header />
-      <div className="min-h-screen bg-background pt-14 md:pl-72 md:pt-0">
+      <div className="branded-app-shell min-h-screen bg-background pt-14 md:pl-72 md:pt-0">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">Admin Dashboard</h1>
@@ -225,7 +225,7 @@ const AdminDashboard = () => {
           </div>
 
           <div className="grid gap-6 md:grid-cols-3 mb-8">
-            <Card>
+            <Card className="brand-visual-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
@@ -234,7 +234,7 @@ const AdminDashboard = () => {
                 <div className="text-2xl font-bold">{stats.total}</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="brand-visual-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Active Employees</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -243,7 +243,7 @@ const AdminDashboard = () => {
                 <div className="text-2xl font-bold">{stats.active}</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="brand-visual-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Monthly Payroll</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />

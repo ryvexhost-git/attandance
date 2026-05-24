@@ -121,7 +121,7 @@ const EmployeeDashboard = () => {
         <meta name="description" content="Track your attendance and view payroll information" />
       </Helmet>
       <Header />
-      <div className="min-h-screen bg-background pt-14 md:pl-72 md:pt-0">
+      <div className="branded-app-shell min-h-screen bg-background pt-14 md:pl-72 md:pt-0">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">Welcome, {currentUser?.name}</h1>
@@ -129,7 +129,7 @@ const EmployeeDashboard = () => {
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2 mb-8">
-            <Card>
+            <Card className="brand-visual-card">
               <CardHeader>
                 <CardTitle>Employee Profile</CardTitle>
                 <CardDescription>Your account information</CardDescription>
@@ -175,7 +175,7 @@ const EmployeeDashboard = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="brand-visual-card">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Clock className="h-5 w-5" />
@@ -214,7 +214,7 @@ const EmployeeDashboard = () => {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-            <Card>
+            <Card className="brand-visual-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Today's Earnings</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -225,7 +225,7 @@ const EmployeeDashboard = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="brand-visual-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Weekly Earnings</CardTitle>
                 <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -236,7 +236,7 @@ const EmployeeDashboard = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="brand-visual-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Monthly Earnings</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />

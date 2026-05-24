@@ -88,7 +88,7 @@ const AdminEmployees = () => {
         <meta name="description" content="Select one employee and view their full profile details" />
       </Helmet>
       <Header />
-      <div className="min-h-screen bg-background pt-14 md:pl-72 md:pt-0">
+      <div className="branded-app-shell min-h-screen bg-background pt-14 md:pl-72 md:pt-0">
         <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
           <div className="mb-8">
             <h1 className="mb-2 text-3xl font-bold text-foreground">Employee Details</h1>

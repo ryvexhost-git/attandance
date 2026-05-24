@@ -89,14 +89,14 @@ const AttendanceRecords = () => {
         <meta name="description" content="View your attendance history and punch records" />
       </Helmet>
       <Header />
-      <div className="min-h-screen bg-background pt-14 md:pl-72 md:pt-0">
+      <div className="branded-app-shell min-h-screen bg-background pt-14 md:pl-72 md:pt-0">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">Attendance Records</h1>
             <p className="text-muted-foreground">View your punch history and work hours</p>
           </div>
 
-          <Card className="mb-6">
+          <Card className="brand-visual-card mb-6">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5" />
