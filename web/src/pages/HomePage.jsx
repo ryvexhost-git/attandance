@@ -17,7 +17,7 @@ const HomePage = () => {
       <Header />
       <div className="branded-app-shell min-h-screen bg-background">
         <section className="branded-login-surface relative flex min-h-[90vh] items-center justify-center px-4 py-20">
-          <div className="container mx-auto text-center max-w-4xl">
+          <div className="coffee-hero-copy container relative z-10 mx-auto max-w-4xl text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
               <Clock className="h-4 w-4" />
               Modern Workforce Management

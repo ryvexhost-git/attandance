@@ -53,14 +53,14 @@ const LoginPage = () => {
       <Header />
       <div className="branded-login-surface min-h-[calc(100vh-4rem)] px-4 py-12">
         <div className="relative z-10 mx-auto grid min-h-[calc(100vh-10rem)] w-full max-w-6xl items-center gap-10 lg:grid-cols-[1fr_420px]">
-          <div className="hidden max-w-xl lg:block">
+          <div className="coffee-hero-copy hidden max-w-xl lg:block">
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-primary">Coffee Bun Team</p>
             <h1 className="mb-4 text-5xl font-bold leading-tight text-foreground">Attendance made simple for every shift.</h1>
             <p className="text-lg text-muted-foreground">
               Sign in to manage punch-in records, payroll, and employee photo verification from one clean console.
             </p>
           </div>
-          <Card className="branded-login-panel w-full max-w-md justify-self-center">
+          <Card className="branded-login-panel w-full max-w-md justify-self-center border-0 bg-transparent shadow-none">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">Welcome back</CardTitle>
               <CardDescription>Sign in to your account to continue</CardDescription>
