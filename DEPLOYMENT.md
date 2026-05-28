@@ -39,7 +39,7 @@ Install Command: npm install
 
 ## Database Setup
 
-This project uses Prisma with PostgreSQL. Vercel runs `prisma migrate deploy` during the build when `VERCEL=1`, then creates the first admin user if it does not exist.
+This project uses Prisma with PostgreSQL. The app creates or updates the required tables and the first admin user when the API is first used, so the normal Vercel build does not need direct database migration access.
 
 To initialize or sync the database manually from your machine:
 

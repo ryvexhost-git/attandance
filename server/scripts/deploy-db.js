@@ -1,10 +1,10 @@
 const { execFileSync } = require('child_process');
 const path = require('path');
 
-const shouldDeployDatabase = process.env.VERCEL === '1' || process.env.RUN_DB_DEPLOY === '1';
+const shouldDeployDatabase = process.env.RUN_DB_DEPLOY === '1';
 
 if (!shouldDeployDatabase) {
-  console.log('Skipping database deploy outside Vercel. Set RUN_DB_DEPLOY=1 to run it locally.');
+  console.log('Skipping database deploy during build. Set RUN_DB_DEPLOY=1 to run migrations manually.');
   process.exit(0);
 }
 
