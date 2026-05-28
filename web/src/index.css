@@ -98,16 +98,18 @@ html {
   .branded-login-surface {
     position: relative;
     overflow: hidden;
-    background: hsl(38 36% 84%);
+    background:
+      linear-gradient(135deg, hsl(176 47% 92%) 0%, hsl(42 50% 96%) 48%, hsl(34 70% 94%) 100%);
   }
 
   .branded-login-surface::before {
     content: "";
     position: absolute;
-    inset: 0;
-    background: url("/cbimgback.jpg") center / contain no-repeat;
-    filter: saturate(1.08) contrast(1.04);
-    opacity: 0.98;
+    inset: -15% -10% auto auto;
+    width: min(52vw, 620px);
+    aspect-ratio: 1;
+    border-radius: 999px;
+    background: radial-gradient(circle, hsl(var(--primary) / 0.16), transparent 64%);
     pointer-events: none;
   }
 
@@ -116,10 +118,40 @@ html {
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse 54% 44% at 55% 64%, hsl(42 45% 91% / 0.98) 0%, hsl(42 45% 91% / 0.86) 46%, transparent 72%),
-      linear-gradient(90deg, transparent 24%, hsl(42 45% 91% / 0.2) 38%, hsl(42 45% 91% / 0.42) 60%, hsl(42 45% 91% / 0.28) 78%, transparent 96%),
-      linear-gradient(180deg, hsl(var(--background) / 0.04), hsl(var(--background) / 0.14));
+      radial-gradient(circle at 8% 18%, hsl(37 88% 74% / 0.2), transparent 26%),
+      radial-gradient(circle at 82% 82%, hsl(174 72% 32% / 0.16), transparent 30%),
+      linear-gradient(90deg, hsl(var(--background) / 0.62), hsl(var(--background) / 0.24));
     pointer-events: none;
+  }
+
+  .login-orbit {
+    position: absolute;
+    inset: auto auto 8% 8%;
+    width: min(32vw, 360px);
+    aspect-ratio: 1;
+    border: 1px solid hsl(var(--primary) / 0.14);
+    border-radius: 999px;
+    pointer-events: none;
+  }
+
+  .login-orbit::before,
+  .login-orbit::after {
+    content: "";
+    position: absolute;
+    border-radius: 999px;
+    background: hsl(var(--primary) / 0.12);
+  }
+
+  .login-orbit::before {
+    inset: 18%;
+  }
+
+  .login-orbit::after {
+    right: 8%;
+    top: 18%;
+    width: 46px;
+    aspect-ratio: 1;
+    background: hsl(37 88% 74% / 0.44);
   }
 
   .branded-login-panel {
@@ -147,6 +179,20 @@ html {
     z-index: -1;
     background: radial-gradient(ellipse, hsl(36 26% 84% / 0.9) 0%, hsl(36 26% 84% / 0.68) 46%, transparent 74%);
     filter: blur(10px);
+  }
+
+  .login-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .login-feature-tile {
+    border: 1px solid hsl(var(--border) / 0.8);
+    border-radius: 0.5rem;
+    background: hsl(var(--card) / 0.64);
+    padding: 1rem;
+    backdrop-filter: blur(14px);
   }
 
   .branded-app-shell {
