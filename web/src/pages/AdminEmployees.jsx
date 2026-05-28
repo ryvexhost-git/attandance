@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { CalendarDays, DollarSign, Image as ImageIcon, Mail, Phone, Search, UserRound } from 'lucide-react';
+import { CalendarDays, IndianRupee, Image as ImageIcon, Mail, Phone, Search, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import Header from '@/components/Header.jsx';
 import apiClient from '@/lib/apiClient.js';
@@ -22,7 +22,7 @@ const formatDate = (value) => {
 
 const formatMoney = (value) => {
   if (typeof value !== 'number') return '-';
-  return `Rs.${value.toFixed(2)}`;
+  return `Rs. ${value.toFixed(2)}`;
 };
 
 const getInitials = (name = '') => (
@@ -90,7 +90,7 @@ const AdminEmployees = () => {
       <Header />
       <div className="branded-app-shell min-h-screen bg-background pt-14 md:pl-72 md:pt-0">
         <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-          <div className="mb-8">
+          <div className="app-page-header">
             <h1 className="mb-2 text-3xl font-bold text-foreground">Employee Details</h1>
             <p className="text-muted-foreground">Select an employee name to display only that employee information.</p>
           </div>
@@ -202,8 +202,8 @@ const AdminEmployees = () => {
                       <DetailItem icon={Mail} label="Email" value={selectedEmployee.email} />
                       <DetailItem icon={Phone} label="Phone" value={selectedEmployee.phone} />
                       <DetailItem icon={CalendarDays} label="Joining Date" value={formatDate(selectedEmployee.joiningDate)} />
-                      <DetailItem icon={DollarSign} label="Daily Wage" value={formatMoney(selectedEmployee.dailyWage)} />
-                      <DetailItem icon={DollarSign} label="Hourly Rate" value={formatMoney(selectedEmployee.hourlyRate)} />
+                      <DetailItem icon={IndianRupee} label="Daily Wage" value={formatMoney(selectedEmployee.dailyWage)} />
+                      <DetailItem icon={IndianRupee} label="Hourly Rate" value={formatMoney(selectedEmployee.hourlyRate)} />
                       <DetailItem icon={UserRound} label="Employee ID" value={selectedEmployee.employeeCode} />
                     </div>
                   </CardContent>

@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LogOut, User, LayoutDashboard, Clock, DollarSign, ChevronDown, Users } from 'lucide-react';
+import { Menu, LogOut, User, LayoutDashboard, Clock, IndianRupee, ChevronDown, Users, Sparkles } from 'lucide-react';
 
 const Header = () => {
   const { currentUser, userRole, logout, isAuthenticated } = useAuth();
@@ -19,7 +19,7 @@ const Header = () => {
   const employeeLinks = [
     { to: '/employee-dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/attendance-records', label: 'Attendance', icon: Clock },
-    { to: '/payroll-summary', label: 'Payroll', icon: DollarSign }
+    { to: '/payroll-summary', label: 'Payroll', icon: IndianRupee }
   ];
 
   const links = userRole === 'admin' ? adminLinks : userRole === 'employee' ? employeeLinks : [];
@@ -34,10 +34,10 @@ const Header = () => {
             key={link.to}
             to={link.to}
             onClick={() => mobile && setMobileMenuOpen(false)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+            className={`flex items-center gap-2 rounded-md px-3 py-2 transition-all duration-200 ${
               isActive
-                ? 'bg-zinc-800 text-white font-medium'
-                : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'
+                ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
+                : 'text-zinc-400 hover:bg-white/5 hover:text-white'
             }`}
           >
             <Icon className="h-4 w-4" />
@@ -50,8 +50,8 @@ const Header = () => {
 
   const SidebarContent = ({ mobile = false }) => (
     <div className="flex h-full flex-col bg-zinc-950 text-zinc-300">
-      <div className="flex h-16 items-center gap-3 border-b border-zinc-800 px-5">
-        <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary">
+      <div className="flex h-16 items-center gap-3 border-b border-white/10 px-5">
+        <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary shadow-lg shadow-primary/20">
           <Clock className="h-5 w-5 text-primary-foreground" />
         </div>
         <div className="min-w-0">
@@ -60,14 +60,14 @@ const Header = () => {
         </div>
       </div>
 
-      <div className="border-b border-zinc-800 px-5 py-4">
+      <div className="border-b border-white/10 px-5 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-800">
+          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-white/10">
             <User className="h-4 w-4" />
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-medium text-white">{currentUser?.name || currentUser?.email}</p>
-            <p className="text-xs capitalize text-zinc-500">{userRole}</p>
+            <p className="text-xs capitalize text-zinc-500">{userRole} workspace</p>
           </div>
         </div>
       </div>
@@ -97,8 +97,8 @@ const Header = () => {
                     onClick={() => mobile && setMobileMenuOpen(false)}
                     className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
                       isActive
-                        ? 'bg-zinc-800 text-white'
-                        : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'
+                        ? 'bg-white/10 text-white'
+                        : 'text-zinc-400 hover:bg-white/5 hover:text-white'
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -111,8 +111,8 @@ const Header = () => {
         )}
       </nav>
 
-      <div className="border-t border-zinc-800 p-3">
-        <Button onClick={logout} variant="ghost" className="w-full justify-start text-zinc-300 hover:bg-zinc-900 hover:text-white">
+      <div className="border-t border-white/10 p-3">
+        <Button onClick={logout} variant="ghost" className="w-full justify-start text-zinc-300 hover:bg-white/5 hover:text-white">
           <LogOut className="h-4 w-4 mr-2" />
           Logout
         </Button>
@@ -124,7 +124,7 @@ const Header = () => {
     <>
       {isAuthenticated && (
         <>
-          <aside className="fixed inset-y-0 left-0 z-50 hidden w-72 border-r border-zinc-800 bg-zinc-950 md:block">
+          <aside className="fixed inset-y-0 left-0 z-50 hidden w-72 border-r border-white/10 bg-zinc-950 md:block">
             <SidebarContent />
           </aside>
           <div className="fixed left-4 top-4 z-50 md:hidden">
@@ -143,19 +143,23 @@ const Header = () => {
       )}
 
       {!isAuthenticated && (
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <header className="sticky top-0 z-50 w-full border-b bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary shadow-lg shadow-primary/20">
               <Clock className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="hidden font-semibold text-foreground sm:inline-block">
-              Attendance & Payroll
+              Attendance Register
             </span>
           </Link>
 
             <div className="flex items-center gap-2">
+              <div className="hidden items-center gap-1.5 rounded-md border bg-card/80 px-3 py-1.5 text-xs font-medium text-muted-foreground sm:flex">
+                <Sparkles className="h-3.5 w-3.5 text-primary" />
+                Live payroll-ready records
+              </div>
               <Link to="/login?role=admin">
                 <Button variant="outline" size="sm">
                   Admin Login

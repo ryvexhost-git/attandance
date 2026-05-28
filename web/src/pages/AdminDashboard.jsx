@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Image as ImageIcon, Upload, Users, UserPlus, Edit, Trash2, DollarSign, TrendingUp, X } from 'lucide-react';
+import { Image as ImageIcon, Upload, Users, UserPlus, Edit, Trash2, IndianRupee, TrendingUp, X } from 'lucide-react';
 import { toast } from 'sonner';
 import apiClient from '@/lib/apiClient.js';
 import Header from '@/components/Header.jsx';
@@ -219,13 +219,13 @@ const AdminDashboard = () => {
       <Header />
       <div className="branded-app-shell min-h-screen bg-background pt-14 md:pl-72 md:pt-0">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8">
+          <div className="app-page-header">
             <h1 className="text-3xl font-bold text-foreground mb-2">Admin Dashboard</h1>
             <p className="text-muted-foreground">Manage employees and track payroll</p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3 mb-8">
-            <Card className="brand-visual-card">
+            <Card className="brand-visual-card metric-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
@@ -234,7 +234,7 @@ const AdminDashboard = () => {
                 <div className="text-2xl font-bold">{stats.total}</div>
               </CardContent>
             </Card>
-            <Card className="brand-visual-card">
+            <Card className="brand-visual-card metric-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Active Employees</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -243,13 +243,13 @@ const AdminDashboard = () => {
                 <div className="text-2xl font-bold">{stats.active}</div>
               </CardContent>
             </Card>
-            <Card className="brand-visual-card">
+            <Card className="brand-visual-card metric-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Monthly Payroll</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <IndianRupee className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${stats.totalPayroll.toFixed(2)}</div>
+                <div className="text-2xl font-bold">Rs. {stats.totalPayroll.toFixed(2)}</div>
               </CardContent>
             </Card>
           </div>
@@ -315,7 +315,7 @@ const AdminDashboard = () => {
                         />
                       </div>
                             <div className="space-y-2">
-                        <Label htmlFor="dailyWage">Daily Wage ($)</Label>
+                        <Label htmlFor="dailyWage">Daily Wage (Rs.)</Label>
                         <Input
                           id="dailyWage"
                           type="number"
@@ -326,7 +326,7 @@ const AdminDashboard = () => {
                           required
                           className="text-foreground"
                         />
-                        <p className="text-xs text-muted-foreground">Hourly rate will be calculated as daily wage ÷ 8</p>
+                        <p className="text-xs text-muted-foreground">Hourly rate will be calculated as daily wage / 8</p>
                       </div>
                             <div className="space-y-2">
                         <Label htmlFor="joiningDate">Joining Date</Label>
@@ -465,7 +465,7 @@ const AdminDashboard = () => {
                           </TableCell>
                           <TableCell>{employee.email}</TableCell>
                           <TableCell>{employee.phone || '-'}</TableCell>
-                          <TableCell>${employee.dailyWage?.toFixed(2)}</TableCell>
+                          <TableCell>Rs. {employee.dailyWage?.toFixed(2)}</TableCell>
                           <TableCell>
                             <Badge variant={employee.status === 'active' ? 'default' : 'secondary'}>
                               {employee.status}

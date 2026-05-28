@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign, Calendar, TrendingUp } from 'lucide-react';
+import { IndianRupee, Calendar, TrendingUp } from 'lucide-react';
 import apiClient from '@/lib/apiClient.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import Header from '@/components/Header.jsx';
@@ -100,32 +100,32 @@ const PayrollSummary = () => {
       <Header />
       <div className="branded-app-shell min-h-screen bg-background pt-14 md:pl-72 md:pt-0">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8">
+          <div className="app-page-header">
             <h1 className="text-3xl font-bold text-foreground mb-2">Payroll Summary</h1>
             <p className="text-muted-foreground">View your earnings breakdown by period</p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 mb-8">
-            <Card className="brand-visual-card">
+            <Card className="brand-visual-card metric-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Weekly Earnings</CardTitle>
                 <Calendar className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${totals.weeklyWage.toFixed(2)}</div>
+                <div className="text-2xl font-bold">Rs. {totals.weeklyWage.toFixed(2)}</div>
                 <p className="text-xs text-muted-foreground mt-1">
                   {totals.weeklyHours.toFixed(1)} hours worked this week
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="brand-visual-card">
+            <Card className="brand-visual-card metric-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Monthly Earnings</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${totals.monthlyWage.toFixed(2)}</div>
+                <div className="text-2xl font-bold">Rs. {totals.monthlyWage.toFixed(2)}</div>
                 <p className="text-xs text-muted-foreground mt-1">
                   {totals.monthlyHours.toFixed(1)} hours worked this month
                 </p>
@@ -146,7 +146,7 @@ const PayrollSummary = () => {
                   </div>
                 ) : weeklyBreakdown.length === 0 ? (
                   <div className="text-center py-8">
-                    <DollarSign className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <IndianRupee className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                     <p className="text-muted-foreground">No records for this week</p>
                   </div>
                 ) : (
@@ -166,7 +166,7 @@ const PayrollSummary = () => {
                             {new Date(day.date).toLocaleDateString()}
                           </TableCell>
                           <TableCell>{day.hours.toFixed(1)}h</TableCell>
-                          <TableCell>${day.wage.toFixed(2)}</TableCell>
+                          <TableCell>Rs. {day.wage.toFixed(2)}</TableCell>
                           <TableCell>
                             <Badge variant={day.status === 'completed' ? 'default' : 'secondary'}>
                               {day.status}
@@ -192,7 +192,7 @@ const PayrollSummary = () => {
                   </div>
                 ) : monthlyBreakdown.length === 0 ? (
                   <div className="text-center py-8">
-                    <DollarSign className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <IndianRupee className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                     <p className="text-muted-foreground">No records for this month</p>
                   </div>
                 ) : (
@@ -210,7 +210,7 @@ const PayrollSummary = () => {
                         <TableRow key={week.week}>
                           <TableCell className="font-medium">{week.week}</TableCell>
                           <TableCell>{week.hours.toFixed(1)}h</TableCell>
-                          <TableCell>${week.wage.toFixed(2)}</TableCell>
+                          <TableCell>Rs. {week.wage.toFixed(2)}</TableCell>
                           <TableCell>
                             <Badge variant={week.status === 'completed' ? 'default' : 'secondary'}>
                               {week.status}
@@ -233,15 +233,15 @@ const PayrollSummary = () => {
             <CardContent className="space-y-3">
               <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
                 <span className="text-muted-foreground">Hourly Rate</span>
-                <span className="font-medium">${currentUser?.hourlyRate?.toFixed(2)}/hour</span>
+                <span className="font-medium">Rs. {currentUser?.hourlyRate?.toFixed(2)}/hour</span>
               </div>
               <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
                 <span className="text-muted-foreground">Daily Wage (8 hours)</span>
-                <span className="font-medium">${currentUser?.dailyWage?.toFixed(2)}</span>
+                <span className="font-medium">Rs. {currentUser?.dailyWage?.toFixed(2)}</span>
               </div>
               <div className="p-3 bg-primary/10 rounded-lg">
                 <p className="text-sm text-muted-foreground">
-                  Your daily wage is calculated as: <span className="font-medium text-foreground">Actual Hours Worked × Hourly Rate</span>
+                  Your daily wage is calculated as: <span className="font-medium text-foreground">Actual Hours Worked x Hourly Rate</span>
                 </p>
               </div>
             </CardContent>

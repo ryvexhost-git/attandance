@@ -60,7 +60,7 @@ const LoginPage = () => {
               Sign in to manage punch-in records, payroll, and employee photo verification from one clean console.
             </p>
           </div>
-          <Card className="branded-login-panel w-full max-w-md justify-self-center border-0 bg-transparent shadow-none">
+          <Card className="glass-panel w-full max-w-md justify-self-center rounded-lg">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">Welcome back</CardTitle>
               <CardDescription>Sign in to your account to continue</CardDescription>
