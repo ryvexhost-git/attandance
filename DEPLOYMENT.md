@@ -11,9 +11,13 @@ This repository is configured to deploy from the `apps` directory as a single Ve
 Set these in Vercel Project Settings:
 
 ```text
-DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public
+DATABASE_URL=postgresql://USER:PASSWORD@HOST.neon.tech/DATABASE?sslmode=require
 JWT_SECRET=replace-with-a-long-random-secret
 ```
+
+For NeonDB, use the PostgreSQL connection string from Neon. The pooled or direct connection string is fine for this app, as long as it starts with `postgresql://` or `postgres://` and includes SSL, for example `sslmode=require`.
+
+Make sure the variables are available for the Vercel environment you are deploying to, such as Production and Preview if you use both.
 
 Optional:
 
@@ -39,7 +43,7 @@ Install Command: npm install
 
 ## Database Setup
 
-This project uses Prisma with PostgreSQL. The app creates or updates the required tables and the first admin user when the API is first used, so the normal Vercel build does not need direct database migration access.
+This project uses Prisma with PostgreSQL/NeonDB. The app creates or updates the required tables and the first admin user when the API is first used, so the normal Vercel build does not need direct database migration access.
 
 To initialize or sync the database manually from your machine:
 
