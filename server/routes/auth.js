@@ -8,43 +8,22 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 router.post('/login', async (req, res) => {
-  const { email, password, role } = req.body;
+  const { email, password } = req.body;
 
   try {
     await ensureDatabase(prisma);
 
-    let user;
-    if (role === 'admin') {
-      user = await prisma.admin.findUnique({ where: { email } });
-    } else {
-      user = await prisma.employee.findUnique({ where: { email } });
+    const admin = await prisma.admin.findUnique({ where: { email } });
+    if (admin && await bcrypt.compare(password, admin.password)) {
+      return sendLoginResponse(res, admin, 'admin');
     }
 
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+    const employee = await prisma.employee.findUnique({ where: { email } });
+    if (employee && await bcrypt.compare(password, employee.password)) {
+      return sendLoginResponse(res, employee, 'employee');
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
-    }
-
-    if (!process.env.JWT_SECRET) {
-      console.error('Login error: JWT_SECRET is not configured');
-      return res.status(500).json({ message: 'JWT_SECRET is not configured' });
-    }
-
-    const token = jwt.sign(
-      { id: user.id, email: user.email, role: role },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    const { password: _, ...userWithoutPassword } = user;
-    res.json({
-      token,
-      user: { ...userWithoutPassword, role }
-    });
+    return res.status(401).json({ message: 'Invalid email or password' });
   } catch (error) {
     console.error('Login error:', error);
     if (error.code === 'P2021' || error.code === 'P2022') {
@@ -55,5 +34,24 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Server error', detail: error.message });
   }
 });
+
+const sendLoginResponse = (res, user, role) => {
+  if (!process.env.JWT_SECRET) {
+    console.error('Login error: JWT_SECRET is not configured');
+    return res.status(500).json({ message: 'JWT_SECRET is not configured' });
+  }
+
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role },
+    process.env.JWT_SECRET,
+    { expiresIn: '24h' }
+  );
+
+  const { password: _, ...userWithoutPassword } = user;
+  return res.json({
+    token,
+    user: { ...userWithoutPassword, role }
+  });
+};
 
 module.exports = router;

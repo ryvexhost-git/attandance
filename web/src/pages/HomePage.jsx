@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Camera, CheckCircle2, Clock, IndianRupee, Shield, TrendingUp, Users } from 'lucide-react';
+import { Camera, CheckCircle2, Clock, IndianRupee, LogIn, Shield, TrendingUp } from 'lucide-react';
 import Header from '@/components/Header.jsx';
 
 const featureBlocks = [
@@ -53,16 +53,10 @@ const HomePage = () => {
                 Manage employee records, selfie-verified shifts, and wage summaries from a cleaner dashboard built for daily use.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link to="/login?role=admin">
+                <Link to="/login">
                   <Button size="lg" className="w-full sm:w-auto">
-                    <Shield className="h-5 w-5" />
-                    Admin Login
-                  </Button>
-                </Link>
-                <Link to="/login?role=employee">
-                  <Button size="lg" variant="outline" className="w-full bg-card/80 sm:w-auto">
-                    <Users className="h-5 w-5" />
-                    Employee Login
+                    <LogIn className="h-5 w-5" />
+                    Login
                   </Button>
                 </Link>
               </div>
@@ -167,21 +161,15 @@ const HomePage = () => {
 
         <section className="px-4 py-16">
           <div className="container mx-auto max-w-4xl text-center">
-            <h2 className="text-3xl font-bold text-foreground md:text-4xl">Start with your role</h2>
+            <h2 className="text-3xl font-bold text-foreground md:text-4xl">Start with one secure login</h2>
             <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-              The dashboard opens directly into the tools each user needs.
+              Admin credentials open the admin dashboard. Employee credentials open the employee workspace.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link to="/login?role=admin">
+              <Link to="/login">
                 <Button size="lg" className="w-full sm:w-auto">
-                  <Shield className="h-5 w-5" />
-                  Admin Login
-                </Button>
-              </Link>
-              <Link to="/login?role=employee">
-                <Button size="lg" variant="outline" className="w-full bg-card/80 sm:w-auto">
-                  <Users className="h-5 w-5" />
-                  Employee Login
+                  <LogIn className="h-5 w-5" />
+                  Login
                 </Button>
               </Link>
             </div>

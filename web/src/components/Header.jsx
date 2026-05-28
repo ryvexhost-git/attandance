@@ -160,14 +160,9 @@ const Header = () => {
                 <Sparkles className="h-3.5 w-3.5 text-primary" />
                 Live payroll-ready records
               </div>
-              <Link to="/login?role=admin">
-                <Button variant="outline" size="sm">
-                  Admin Login
-                </Button>
-              </Link>
-              <Link to="/login?role=employee">
+              <Link to="/login">
                 <Button size="sm">
-                  Employee Login
+                  Login
                 </Button>
               </Link>
             </div>
