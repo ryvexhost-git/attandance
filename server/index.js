@@ -31,8 +31,8 @@ app.get('/api/health/db', async (req, res) => {
       throw new Error('DATABASE_URL is not configured.');
     }
 
-    if (!process.env.DATABASE_URL.startsWith('file:') && !/^postgres(ql)?:\/\//.test(process.env.DATABASE_URL)) {
-      throw new Error('DATABASE_URL must start with file:, postgresql://, or postgres://.');
+    if (!/^postgres(ql)?:\/\//.test(process.env.DATABASE_URL)) {
+      throw new Error('DATABASE_URL must start with postgresql:// or postgres://.');
     }
 
     await prisma.$queryRaw`SELECT 1`;

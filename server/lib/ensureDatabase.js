@@ -18,14 +18,8 @@ async function initializeDatabase(prisma) {
     throw new Error('DATABASE_URL is not configured.');
   }
 
-  if (process.env.DATABASE_URL.startsWith('file:')) {
-    await initializeSqliteDatabase(prisma);
-    await ensureAdmin(prisma);
-    return;
-  }
-
   if (!/^postgres(ql)?:\/\//.test(process.env.DATABASE_URL)) {
-    throw new Error('DATABASE_URL must start with file:, postgresql://, or postgres://.');
+    throw new Error('DATABASE_URL must start with postgresql:// or postgres://.');
   }
 
   await prisma.$executeRawUnsafe(`
@@ -97,71 +91,6 @@ async function initializeDatabase(prisma) {
   `);
 
   await ensureAdmin(prisma);
-}
-
-async function initializeSqliteDatabase(prisma) {
-  await prisma.$executeRawUnsafe(`
-    CREATE TABLE IF NOT EXISTS "Admin" (
-      "id" TEXT NOT NULL PRIMARY KEY,
-      "email" TEXT NOT NULL,
-      "password" TEXT NOT NULL,
-      "permissions" TEXT,
-      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-    );
-  `);
-
-  await prisma.$executeRawUnsafe(`
-    CREATE TABLE IF NOT EXISTS "Employee" (
-      "id" TEXT NOT NULL PRIMARY KEY,
-      "employee_code" TEXT,
-      "email" TEXT NOT NULL,
-      "password" TEXT NOT NULL,
-      "name" TEXT NOT NULL,
-      "phone" TEXT,
-      "daily_wage" REAL NOT NULL,
-      "hourly_rate" REAL NOT NULL,
-      "joining_date" DATETIME NOT NULL,
-      "status" TEXT NOT NULL DEFAULT 'active',
-      "profile_photo" TEXT,
-      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-    );
-  `);
-
-  await prisma.$executeRawUnsafe(`
-    CREATE TABLE IF NOT EXISTS "Attendance" (
-      "id" TEXT NOT NULL PRIMARY KEY,
-      "employee_id" TEXT NOT NULL,
-      "punch_in_time" DATETIME NOT NULL,
-      "punch_out_time" DATETIME,
-      "punch_in_photo" TEXT,
-      "punch_out_photo" TEXT,
-      "work_hours" REAL,
-      "daily_wage_earned" REAL,
-      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      CONSTRAINT "Attendance_employee_id_fkey"
-      FOREIGN KEY ("employee_id") REFERENCES "Employee"("id")
-      ON DELETE RESTRICT ON UPDATE CASCADE
-    );
-  `);
-
-  await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "Admin_email_key" ON "Admin"("email");');
-  await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "Employee_email_key" ON "Employee"("email");');
-  await addSqliteColumnIfMissing(prisma, 'Employee', 'employee_code', 'TEXT');
-  await addSqliteColumnIfMissing(prisma, 'Employee', 'profile_photo', 'TEXT');
-  await backfillEmployeeCodes(prisma);
-  await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "Employee_employee_code_key" ON "Employee"("employee_code");');
-}
-
-async function addSqliteColumnIfMissing(prisma, tableName, columnName, columnDefinition) {
-  const columns = await prisma.$queryRawUnsafe(`PRAGMA table_info("${tableName}")`);
-  const hasColumn = columns.some((column) => column.name === columnName);
-
-  if (!hasColumn) {
-    await prisma.$executeRawUnsafe(`ALTER TABLE "${tableName}" ADD COLUMN "${columnName}" ${columnDefinition};`);
-  }
 }
 
 async function backfillEmployeeCodes(prisma) {
