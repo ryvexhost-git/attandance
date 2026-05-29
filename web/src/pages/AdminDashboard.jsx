@@ -13,6 +13,8 @@ import { toast } from 'sonner';
 import apiClient from '@/lib/apiClient.js';
 import Header from '@/components/Header.jsx';
 
+const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+
 const AdminDashboard = () => {
   const [employees, setEmployees] = useState([]);
   const [recentAttendance, setRecentAttendance] = useState([]);
@@ -25,6 +27,12 @@ const AdminDashboard = () => {
     name: '',
     email: '',
     phone: '',
+    dateOfBirth: '',
+    place: '',
+    educationalQualification: '',
+    governmentIdFront: '',
+    governmentIdBack: '',
+    bloodGroup: '',
     dailyWage: '',
     joiningDate: '',
     status: 'active',
@@ -177,6 +185,25 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleImageFieldChange = async (event, fieldName) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+
+    try {
+      const image = await resizeImageFile(file);
+      setFormData({ ...formData, [fieldName]: image });
+    } catch (error) {
+      console.error('Document image error:', error);
+      toast.error('Failed to process image');
+    }
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this employee? This action cannot be undone.')) return;
 
@@ -199,6 +226,12 @@ const AdminDashboard = () => {
       name: employee.name,
       email: employee.email,
       phone: employee.phone || '',
+      dateOfBirth: employee.dateOfBirth ? employee.dateOfBirth.split('T')[0] : '',
+      place: employee.place || '',
+      educationalQualification: employee.educationalQualification || '',
+      governmentIdFront: employee.governmentIdFront || '',
+      governmentIdBack: employee.governmentIdBack || '',
+      bloodGroup: employee.bloodGroup || '',
       dailyWage: employee.dailyWage.toString(),
       joiningDate: employee.joiningDate ? employee.joiningDate.split('T')[0] : '',
       status: employee.status,
@@ -215,6 +248,12 @@ const AdminDashboard = () => {
       name: '',
       email: '',
       phone: '',
+      dateOfBirth: '',
+      place: '',
+      educationalQualification: '',
+      governmentIdFront: '',
+      governmentIdBack: '',
+      bloodGroup: '',
       dailyWage: '',
       joiningDate: '',
       status: 'active',
@@ -231,6 +270,12 @@ const AdminDashboard = () => {
       name: '',
       email: '',
       phone: '',
+      dateOfBirth: '',
+      place: '',
+      educationalQualification: '',
+      governmentIdFront: '',
+      governmentIdBack: '',
+      bloodGroup: '',
       dailyWage: '',
       joiningDate: '',
       status: 'active',
@@ -355,6 +400,47 @@ const AdminDashboard = () => {
                         />
                       </div>
                             <div className="space-y-2">
+                        <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                        <Input
+                          id="dateOfBirth"
+                          type="date"
+                          value={formData.dateOfBirth}
+                          onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                          className="text-foreground"
+                        />
+                      </div>
+                            <div className="space-y-2">
+                        <Label htmlFor="place">Place</Label>
+                        <Input
+                          id="place"
+                          value={formData.place}
+                          onChange={(e) => setFormData({ ...formData, place: e.target.value })}
+                          className="text-foreground"
+                        />
+                      </div>
+                            <div className="space-y-2">
+                        <Label htmlFor="educationalQualification">Educational Qualification</Label>
+                        <Input
+                          id="educationalQualification"
+                          value={formData.educationalQualification}
+                          onChange={(e) => setFormData({ ...formData, educationalQualification: e.target.value })}
+                          className="text-foreground"
+                        />
+                      </div>
+                            <div className="space-y-2">
+                        <Label htmlFor="bloodGroup">Blood Group</Label>
+                        <Select value={formData.bloodGroup} onValueChange={(value) => setFormData({ ...formData, bloodGroup: value })}>
+                          <SelectTrigger className="text-foreground">
+                            <SelectValue placeholder="Select blood group" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {BLOOD_GROUPS.map((group) => (
+                              <SelectItem key={group} value={group}>{group}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                            <div className="space-y-2">
                         <Label htmlFor="dailyWage">Daily Wage (Rs.)</Label>
                         <Input
                           id="dailyWage"
@@ -446,6 +532,78 @@ const AdminDashboard = () => {
                             )}
                           </div>
                         <p className="text-xs text-muted-foreground">Reference photo for punch-in and punch-out verification.</p>
+                        <div className="space-y-3 border-t pt-4">
+                          <Label>Government ID Front</Label>
+                          <div className="aspect-[1.58] w-full overflow-hidden rounded-md border bg-background flex items-center justify-center">
+                            {formData.governmentIdFront ? (
+                              <img src={formData.governmentIdFront} alt="Government ID front" className="h-full w-full object-cover" />
+                            ) : (
+                              <ImageIcon className="h-10 w-10 text-muted-foreground" />
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            <Label
+                              htmlFor="governmentIdFront"
+                              className="inline-flex h-10 flex-1 cursor-pointer items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+                            >
+                              <Upload className="h-4 w-4 mr-2" />
+                              Upload Front
+                            </Label>
+                            <Input
+                              id="governmentIdFront"
+                              type="file"
+                              accept="image/*"
+                              onChange={(event) => handleImageFieldChange(event, 'governmentIdFront')}
+                              className="hidden"
+                            />
+                            {formData.governmentIdFront && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                onClick={() => setFormData({ ...formData, governmentIdFront: '' })}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        <div className="space-y-3 border-t pt-4">
+                          <Label>Government ID Back</Label>
+                          <div className="aspect-[1.58] w-full overflow-hidden rounded-md border bg-background flex items-center justify-center">
+                            {formData.governmentIdBack ? (
+                              <img src={formData.governmentIdBack} alt="Government ID back" className="h-full w-full object-cover" />
+                            ) : (
+                              <ImageIcon className="h-10 w-10 text-muted-foreground" />
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            <Label
+                              htmlFor="governmentIdBack"
+                              className="inline-flex h-10 flex-1 cursor-pointer items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+                            >
+                              <Upload className="h-4 w-4 mr-2" />
+                              Upload Back
+                            </Label>
+                            <Input
+                              id="governmentIdBack"
+                              type="file"
+                              accept="image/*"
+                              onChange={(event) => handleImageFieldChange(event, 'governmentIdBack')}
+                              className="hidden"
+                            />
+                            {formData.governmentIdBack && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                onClick={() => setFormData({ ...formData, governmentIdBack: '' })}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
                       </div>
                         </div>
                       </div>

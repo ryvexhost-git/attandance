@@ -43,6 +43,12 @@ async function initializeDatabase(prisma) {
       "login_password" TEXT,
       "name" TEXT NOT NULL,
       "phone" TEXT,
+      "date_of_birth" TIMESTAMP(3),
+      "place" TEXT,
+      "educational_qualification" TEXT,
+      "government_id_front" TEXT,
+      "government_id_back" TEXT,
+      "blood_group" TEXT,
       "daily_wage" DOUBLE PRECISION NOT NULL,
       "hourly_rate" DOUBLE PRECISION NOT NULL,
       "joining_date" TIMESTAMP(3) NOT NULL,
@@ -74,6 +80,12 @@ async function initializeDatabase(prisma) {
   await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "Employee_email_key" ON "Employee"("email");');
   await prisma.$executeRawUnsafe('ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "employee_code" TEXT;');
   await prisma.$executeRawUnsafe('ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "login_password" TEXT;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "date_of_birth" TIMESTAMP(3);');
+  await prisma.$executeRawUnsafe('ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "place" TEXT;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "educational_qualification" TEXT;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "government_id_front" TEXT;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "government_id_back" TEXT;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "blood_group" TEXT;');
   await backfillEmployeeCodes(prisma);
   await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "Employee_employee_code_key" ON "Employee"("employee_code");');
   await backfillEmployeeLoginPasswords(prisma);

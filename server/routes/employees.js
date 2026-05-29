@@ -23,7 +23,21 @@ router.get('/', auth, adminOnly, async (req, res) => {
 
 // Create employee (Admin only)
 router.post('/', auth, adminOnly, async (req, res) => {
-  const { name, email, phone, dailyWage, joiningDate, status, profilePhoto } = req.body;
+  const {
+    name,
+    email,
+    phone,
+    dateOfBirth,
+    place,
+    educationalQualification,
+    governmentIdFront,
+    governmentIdBack,
+    bloodGroup,
+    dailyWage,
+    joiningDate,
+    status,
+    profilePhoto
+  } = req.body;
 
   try {
     await ensureDatabase(prisma);
@@ -45,6 +59,12 @@ router.post('/', auth, adminOnly, async (req, res) => {
         password: hashedPassword,
         loginPassword,
         phone,
+        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+        place,
+        educationalQualification,
+        governmentIdFront,
+        governmentIdBack,
+        bloodGroup,
         dailyWage,
         hourlyRate,
         joiningDate: parsedJoiningDate,
@@ -69,7 +89,22 @@ router.post('/', auth, adminOnly, async (req, res) => {
 
 // Update employee (Admin only)
 router.put('/:id', auth, adminOnly, async (req, res) => {
-  const { name, email, phone, dailyWage, joiningDate, status, password, profilePhoto } = req.body;
+  const {
+    name,
+    email,
+    phone,
+    dateOfBirth,
+    place,
+    educationalQualification,
+    governmentIdFront,
+    governmentIdBack,
+    bloodGroup,
+    dailyWage,
+    joiningDate,
+    status,
+    password,
+    profilePhoto
+  } = req.body;
 
   try {
     await ensureDatabase(prisma);
@@ -80,6 +115,12 @@ router.put('/:id', auth, adminOnly, async (req, res) => {
       name,
       email,
       phone,
+      dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+      place,
+      educationalQualification,
+      governmentIdFront,
+      governmentIdBack,
+      bloodGroup,
       dailyWage,
       hourlyRate: dailyWage / 8,
       joiningDate: parsedJoiningDate,

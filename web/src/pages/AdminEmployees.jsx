@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { CalendarDays, IndianRupee, Image as ImageIcon, Mail, Phone, Search, UserRound } from 'lucide-react';
+import { CalendarDays, Droplets, GraduationCap, IdCard, IndianRupee, Image as ImageIcon, Mail, MapPin, Phone, Search, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import Header from '@/components/Header.jsx';
 import apiClient from '@/lib/apiClient.js';
@@ -41,6 +41,22 @@ const DetailItem = ({ icon: Icon, label, value }) => (
       {label}
     </div>
     <div className="break-words text-base font-medium text-foreground">{value || '-'}</div>
+  </div>
+);
+
+const DocumentImage = ({ label, src }) => (
+  <div className="rounded-md border bg-background p-4">
+    <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <IdCard className="h-4 w-4" />
+      {label}
+    </div>
+    {src ? (
+      <img src={src} alt={label} className="aspect-[1.58] w-full rounded-md border object-cover" />
+    ) : (
+      <div className="flex aspect-[1.58] w-full items-center justify-center rounded-md border bg-muted/40 text-sm text-muted-foreground">
+        Not uploaded
+      </div>
+    )}
   </div>
 );
 
@@ -201,10 +217,18 @@ const AdminEmployees = () => {
                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                       <DetailItem icon={Mail} label="Email" value={selectedEmployee.email} />
                       <DetailItem icon={Phone} label="Phone" value={selectedEmployee.phone} />
+                      <DetailItem icon={CalendarDays} label="Date of Birth" value={formatDate(selectedEmployee.dateOfBirth)} />
+                      <DetailItem icon={MapPin} label="Place" value={selectedEmployee.place} />
+                      <DetailItem icon={GraduationCap} label="Educational Qualification" value={selectedEmployee.educationalQualification} />
+                      <DetailItem icon={Droplets} label="Blood Group" value={selectedEmployee.bloodGroup} />
                       <DetailItem icon={CalendarDays} label="Joining Date" value={formatDate(selectedEmployee.joiningDate)} />
                       <DetailItem icon={IndianRupee} label="Daily Wage" value={formatMoney(selectedEmployee.dailyWage)} />
                       <DetailItem icon={IndianRupee} label="Hourly Rate" value={formatMoney(selectedEmployee.hourlyRate)} />
                       <DetailItem icon={UserRound} label="Employee ID" value={selectedEmployee.employeeCode} />
+                    </div>
+                    <div className="mt-4 grid gap-4 md:grid-cols-2">
+                      <DocumentImage label="Government ID Front" src={selectedEmployee.governmentIdFront} />
+                      <DocumentImage label="Government ID Back" src={selectedEmployee.governmentIdBack} />
                     </div>
                   </CardContent>
                 </>

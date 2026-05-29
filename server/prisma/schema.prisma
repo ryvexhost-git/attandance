@@ -20,33 +20,39 @@ model Admin {
 }
 
 model Employee {
-  id            String       @id @default(cuid())
-  employeeCode  String?      @unique @map("employee_code")
-  email         String       @unique
-  password      String
-  loginPassword String?      @map("login_password")
-  name          String
-  phone         String?
-  dailyWage     Float        @map("daily_wage")
-  hourlyRate    Float        @map("hourly_rate")
-  joiningDate   DateTime     @map("joining_date")
-  status        String       @default("active")
-  profilePhoto  String?      @map("profile_photo")
-  attendance    Attendance[]
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id                       String       @id @default(cuid())
+  employeeCode             String?      @unique @map("employee_code")
+  email                    String       @unique
+  password                 String
+  loginPassword            String?      @map("login_password")
+  name                     String
+  phone                    String?
+  dateOfBirth              DateTime?    @map("date_of_birth")
+  place                    String?
+  educationalQualification String?      @map("educational_qualification")
+  governmentIdFront        String?      @map("government_id_front")
+  governmentIdBack         String?      @map("government_id_back")
+  bloodGroup               String?      @map("blood_group")
+  dailyWage                Float        @map("daily_wage")
+  hourlyRate               Float        @map("hourly_rate")
+  joiningDate              DateTime     @map("joining_date")
+  status                   String       @default("active")
+  profilePhoto             String?      @map("profile_photo")
+  attendance               Attendance[]
+  createdAt                DateTime     @default(now())
+  updatedAt                DateTime     @updatedAt
 }
 
 model Attendance {
-  id               String   @id @default(cuid())
-  employeeId       String   @map("employee_id")
-  employee         Employee @relation(fields: [employeeId], references: [id])
-  punchInTime      DateTime @map("punch_in_time")
-  punchOutTime     DateTime? @map("punch_out_time")
-  punchInPhoto     String?  @map("punch_in_photo")
-  punchOutPhoto    String?  @map("punch_out_photo")
-  workHours        Float?   @map("work_hours")
-  dailyWageEarned  Float?   @map("daily_wage_earned")
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id              String    @id @default(cuid())
+  employeeId      String    @map("employee_id")
+  employee        Employee  @relation(fields: [employeeId], references: [id])
+  punchInTime     DateTime  @map("punch_in_time")
+  punchOutTime    DateTime? @map("punch_out_time")
+  punchInPhoto    String?   @map("punch_in_photo")
+  punchOutPhoto   String?   @map("punch_out_photo")
+  workHours       Float?    @map("work_hours")
+  dailyWageEarned Float?    @map("daily_wage_earned")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
