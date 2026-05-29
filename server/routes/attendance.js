@@ -91,8 +91,8 @@ router.post('/punch-kiosk', async (req, res) => {
       return res.status(400).json({ message: 'Selfie photo is required' });
     }
 
-    if (typeof verificationScore !== 'number' || verificationScore < 75) {
-      return res.status(400).json({ message: 'Selfie verification must be at least 75% before submitting.' });
+    if (typeof verificationScore !== 'number' || verificationScore < 50) {
+      return res.status(400).json({ message: 'Selfie verification must be at least 50% before submitting.' });
     }
 
     const activeSession = await getOpenAttendanceSession(employee.id);

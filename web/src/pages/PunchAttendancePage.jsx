@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import apiClient from '@/lib/apiClient.js';
 import { comparePhotos } from '@/lib/photoVerification.js';
 
-const REQUIRED_MATCH_PERCENT = 75;
+const REQUIRED_MATCH_PERCENT = 50;
 
 const formatDateTime = (date) => new Intl.DateTimeFormat(undefined, {
   dateStyle: 'medium',
