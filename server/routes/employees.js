@@ -7,6 +7,25 @@ const { ensureDatabase, formatEmployeeCode, generateEmployeeCode, getEmployeeCod
 const router = express.Router();
 const prisma = new PrismaClient();
 
+const isBlank = (value) => String(value ?? '').trim() === '';
+
+const validateRequiredCreateFields = ({ employeeCode, name, phone, dailyWage }) => {
+  const missingFields = [];
+
+  if (isBlank(employeeCode)) missingFields.push('TCB-ID');
+  if (isBlank(name)) missingFields.push('Name');
+  if (isBlank(phone)) missingFields.push('Phone');
+  if (dailyWage === undefined || dailyWage === null || Number.isNaN(Number(dailyWage))) {
+    missingFields.push('Daily Wage');
+  }
+
+  if (missingFields.length > 0) {
+    return `${missingFields.join(', ')} ${missingFields.length === 1 ? 'is' : 'are'} required`;
+  }
+
+  return null;
+};
+
 // Get all employees (Admin only)
 router.get('/', auth, adminOnly, async (req, res) => {
   try {
@@ -61,9 +80,18 @@ router.post('/', auth, adminOnly, async (req, res) => {
   try {
     await ensureDatabase(prisma);
 
-    const employeeCode = req.body.employeeCode
-      ? formatEmployeeCode(req.body.employeeCode)
-      : await generateEmployeeCode(prisma);
+    const validationMessage = validateRequiredCreateFields({
+      employeeCode: req.body.employeeCode,
+      name,
+      phone,
+      dailyWage
+    });
+
+    if (validationMessage) {
+      return res.status(400).json({ message: validationMessage });
+    }
+
+    const employeeCode = formatEmployeeCode(req.body.employeeCode);
     const loginPassword = getEmployeeCodePassword(employeeCode);
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(loginPassword, salt);

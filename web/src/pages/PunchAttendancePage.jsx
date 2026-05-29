@@ -29,6 +29,7 @@ const formatWorkHours = (startDate, endDate) => {
 
 const PunchAttendancePage = () => {
   const [employeeCode, setEmployeeCode] = useState('');
+  const [password, setPassword] = useState('');
   const [lookupLoading, setLookupLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [punchDetails, setPunchDetails] = useState(null);
@@ -69,17 +70,25 @@ const PunchAttendancePage = () => {
       return;
     }
 
+    if (!password) {
+      toast.error('Enter password');
+      return;
+    }
+
     setLookupLoading(true);
     resetCapture();
 
     try {
-      const response = await apiClient.get(`/attendance/punch-lookup/${encodeURIComponent(normalizedCode)}`);
+      const response = await apiClient.post('/attendance/punch-lookup', {
+        employeeCode: normalizedCode,
+        password
+      });
       setEmployeeCode(normalizedCode);
       setPunchDetails(response.data);
       await startCamera();
     } catch (error) {
       setPunchDetails(null);
-      toast.error(error.response?.data?.message || 'Employee ID not found');
+      toast.error(error.response?.data?.message || 'Invalid employee ID or password');
     } finally {
       setLookupLoading(false);
     }
@@ -154,6 +163,7 @@ const PunchAttendancePage = () => {
     try {
       const response = await apiClient.post('/attendance/punch-kiosk', {
         employeeCode,
+        password,
         photo: capturedPhoto,
         verificationScore: matchScore
       });
@@ -190,7 +200,7 @@ const PunchAttendancePage = () => {
                 <IdCard className="h-5 w-5" />
                 Employee Punch
               </CardTitle>
-              <CardDescription>Enter your employee ID to start attendance.</CardDescription>
+              <CardDescription>Enter your employee ID and password to start attendance.</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={lookupEmployee} className="space-y-4">
@@ -200,7 +210,18 @@ const PunchAttendancePage = () => {
                     id="employee-code"
                     value={employeeCode}
                     onChange={(event) => setEmployeeCode(event.target.value.toUpperCase())}
-                    placeholder="TCB24052603"
+                    placeholder="TCB-2026"
+                    className="text-foreground"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="punch-password">Password</Label>
+                  <Input
+                    id="punch-password"
+                    type="password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder="Enter password"
                     className="text-foreground"
                   />
                 </div>

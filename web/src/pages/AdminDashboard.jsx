@@ -401,6 +401,7 @@ const AdminDashboard = () => {
                           id="phone"
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          required
                           className="text-foreground"
                         />
                       </div>

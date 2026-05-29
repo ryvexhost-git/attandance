@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const { PrismaClient } = require('@prisma/client');
 const { auth, adminOnly } = require('../middleware/auth');
 const { ensureDatabase } = require('../lib/ensureDatabase');
@@ -9,6 +10,7 @@ const prisma = new PrismaClient();
 const employeePunchSelect = {
   id: true,
   employeeCode: true,
+  password: true,
   name: true,
   status: true,
   profilePhoto: true,
@@ -25,19 +27,37 @@ const getOpenAttendanceSession = (employeeId) => prisma.attendance.findFirst({
 
 const normalizeEmployeeCode = (employeeCode = '') => employeeCode.trim().toUpperCase();
 
-// Public punch lookup by employee ID. Returns only safe kiosk data.
-router.get('/punch-lookup/:employeeCode', async (req, res) => {
+const findVerifiedPunchEmployee = async (rawEmployeeCode, rawPassword) => {
+  const employeeCode = normalizeEmployeeCode(rawEmployeeCode);
+  const password = String(rawPassword || '');
+
+  if (!employeeCode || !password) {
+    return null;
+  }
+
+  const employee = await prisma.employee.findUnique({
+    where: { employeeCode },
+    select: employeePunchSelect
+  });
+
+  if (!employee || !await bcrypt.compare(password, employee.password)) {
+    return null;
+  }
+
+  return employee;
+};
+
+// Public punch lookup by employee ID and password. Returns only safe kiosk data.
+router.post('/punch-lookup', async (req, res) => {
+  const { employeeCode: rawEmployeeCode, password } = req.body;
+
   try {
     await ensureDatabase(prisma);
 
-    const employeeCode = normalizeEmployeeCode(req.params.employeeCode);
-    const employee = await prisma.employee.findUnique({
-      where: { employeeCode },
-      select: employeePunchSelect
-    });
+    const employee = await findVerifiedPunchEmployee(rawEmployeeCode, password);
 
     if (!employee || employee.status !== 'active') {
-      return res.status(404).json({ message: 'Active employee ID not found' });
+      return res.status(401).json({ message: 'Invalid employee ID or password' });
     }
 
     if (!employee.profilePhoto) {
@@ -68,19 +88,15 @@ router.get('/punch-lookup/:employeeCode', async (req, res) => {
 
 // Public kiosk punch submit by employee ID after client-side photo verification.
 router.post('/punch-kiosk', async (req, res) => {
-  const { employeeCode: rawEmployeeCode, photo, verificationScore } = req.body;
+  const { employeeCode: rawEmployeeCode, password, photo, verificationScore } = req.body;
 
   try {
     await ensureDatabase(prisma);
 
-    const employeeCode = normalizeEmployeeCode(rawEmployeeCode);
-    const employee = await prisma.employee.findUnique({
-      where: { employeeCode },
-      select: employeePunchSelect
-    });
+    const employee = await findVerifiedPunchEmployee(rawEmployeeCode, password);
 
     if (!employee || employee.status !== 'active') {
-      return res.status(404).json({ message: 'Active employee ID not found' });
+      return res.status(401).json({ message: 'Invalid employee ID or password' });
     }
 
     if (!employee.profilePhoto) {
