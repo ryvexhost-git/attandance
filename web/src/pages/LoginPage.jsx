@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Camera, Clock, IndianRupee, LogIn } from 'lucide-react';
+import { Camera, IndianRupee, LogIn } from 'lucide-react';
 import Header from '@/components/Header.jsx';
 
 const LoginPage = () => {
@@ -53,7 +53,7 @@ const LoginPage = () => {
         <div className="relative z-10 mx-auto grid min-h-[calc(100vh-10rem)] w-full max-w-6xl items-center gap-10 lg:grid-cols-[1fr_420px]">
           <div className="hidden max-w-xl lg:block">
             <div className="mb-6 inline-flex items-center gap-2 rounded-md border bg-card/70 px-3 py-2 text-sm font-medium text-primary shadow-sm">
-              <Clock className="h-4 w-4" />
+              <img src="/logo-tcb.png" alt="Coffee Bun" className="h-5 w-5 object-contain" />
               Attendance Register
             </div>
             <h1 className="mb-4 text-5xl font-bold leading-tight text-foreground">A clear start for every shift.</h1>

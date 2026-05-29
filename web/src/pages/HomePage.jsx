@@ -191,7 +191,7 @@ const HomePage = () => {
         <footer className="border-t bg-card/70 px-4 py-8">
           <div className="container mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
             <div className="flex items-center gap-2 font-semibold text-foreground">
-              <Clock className="h-5 w-5 text-primary" />
+              <img src="/logo-tcb.png" alt="Coffee Bun" className="h-7 w-7 object-contain" />
               Attendance Register
             </div>
             <p>Copyright 2026 Attendance Register. All rights reserved.</p>

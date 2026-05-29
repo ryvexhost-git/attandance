@@ -6,6 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Camera, Menu, LogOut, User, LayoutDashboard, Clock, IndianRupee, ChevronDown, Users } from 'lucide-react';
 
+const BrandLogo = ({ className = 'h-8 w-8' }) => (
+  <img src="/logo-tcb.png" alt="Coffee Bun" className={`${className} object-contain`} />
+);
+
 const Header = () => {
   const { currentUser, userRole, logout, isAuthenticated } = useAuth();
   const location = useLocation();
@@ -51,8 +55,8 @@ const Header = () => {
   const SidebarContent = ({ mobile = false }) => (
     <div className="flex h-full flex-col bg-zinc-950 text-zinc-300">
       <div className="flex h-16 items-center gap-3 border-b border-white/10 px-5">
-        <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary shadow-lg shadow-primary/20">
-          <Clock className="h-5 w-5 text-primary-foreground" />
+        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-md bg-white shadow-lg shadow-primary/20">
+          <BrandLogo className="h-9 w-9" />
         </div>
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-white">Attendance</p>
@@ -147,8 +151,8 @@ const Header = () => {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary shadow-lg shadow-primary/20">
-              <Clock className="h-5 w-5 text-primary-foreground" />
+            <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-md bg-white shadow-lg shadow-primary/20">
+              <BrandLogo className="h-8 w-8" />
             </div>
             <span className="hidden font-semibold text-foreground sm:inline-block">
               Attendance Register
