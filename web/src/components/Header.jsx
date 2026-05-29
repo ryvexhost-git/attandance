@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Camera, Menu, LogOut, User, LayoutDashboard, Clock, IndianRupee, ChevronDown, Users, Sparkles } from 'lucide-react';
+import { Camera, Menu, LogOut, User, LayoutDashboard, Clock, IndianRupee, ChevronDown, Users } from 'lucide-react';
 
 const Header = () => {
   const { currentUser, userRole, logout, isAuthenticated } = useAuth();
@@ -156,19 +156,15 @@ const Header = () => {
           </Link>
 
             <div className="flex items-center gap-2">
-              <div className="hidden items-center gap-1.5 rounded-md border bg-card/80 px-3 py-1.5 text-xs font-medium text-muted-foreground sm:flex">
-                <Sparkles className="h-3.5 w-3.5 text-primary" />
-                Live payroll-ready records
-              </div>
+              <Link to="/punch-attendance">
+                <Button size="sm" variant="outline">
+                  <Camera className="h-4 w-4" />
+                  Punch In
+                </Button>
+              </Link>
               <Link to="/login">
                 <Button size="sm" variant="outline">
                   Login
-                </Button>
-              </Link>
-              <Link to="/punch-attendance">
-                <Button size="sm">
-                  <Camera className="h-4 w-4" />
-                  Punch In
                 </Button>
               </Link>
             </div>
