@@ -7,6 +7,7 @@ import ScrollToTop from '@/components/ScrollToTop.jsx';
 import ProtectedRoute from '@/components/ProtectedRoute.jsx';
 import HomePage from '@/pages/HomePage.jsx';
 import LoginPage from '@/pages/LoginPage.jsx';
+import PunchAttendancePage from '@/pages/PunchAttendancePage.jsx';
 import AdminDashboard from '@/pages/AdminDashboard.jsx';
 import AdminEmployees from '@/pages/AdminEmployees.jsx';
 import EmployeeDashboard from '@/pages/EmployeeDashboard.jsx';
@@ -21,6 +22,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/punch-attendance" element={<PunchAttendancePage />} />
           <Route
             path="/admin-dashboard"
             element={

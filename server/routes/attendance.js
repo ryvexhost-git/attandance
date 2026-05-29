@@ -6,6 +6,144 @@ const { ensureDatabase } = require('../lib/ensureDatabase');
 const router = express.Router();
 const prisma = new PrismaClient();
 
+const employeePunchSelect = {
+  id: true,
+  employeeCode: true,
+  name: true,
+  status: true,
+  profilePhoto: true,
+  hourlyRate: true
+};
+
+const getOpenAttendanceSession = (employeeId) => prisma.attendance.findFirst({
+  where: {
+    employeeId,
+    punchOutTime: null
+  },
+  orderBy: { punchInTime: 'desc' }
+});
+
+const normalizeEmployeeCode = (employeeCode = '') => employeeCode.trim().toUpperCase();
+
+// Public punch lookup by employee ID. Returns only safe kiosk data.
+router.get('/punch-lookup/:employeeCode', async (req, res) => {
+  try {
+    await ensureDatabase(prisma);
+
+    const employeeCode = normalizeEmployeeCode(req.params.employeeCode);
+    const employee = await prisma.employee.findUnique({
+      where: { employeeCode },
+      select: employeePunchSelect
+    });
+
+    if (!employee || employee.status !== 'active') {
+      return res.status(404).json({ message: 'Active employee ID not found' });
+    }
+
+    if (!employee.profilePhoto) {
+      return res.status(400).json({ message: 'Profile photo is required before punching. Please contact admin.' });
+    }
+
+    const activeSession = await getOpenAttendanceSession(employee.id);
+
+    res.json({
+      employee: {
+        employeeCode: employee.employeeCode,
+        name: employee.name,
+        profilePhoto: employee.profilePhoto
+      },
+      action: activeSession ? 'punch-out' : 'punch-in',
+      activeSession: activeSession
+        ? {
+          id: activeSession.id,
+          punchInTime: activeSession.punchInTime
+        }
+        : null
+    });
+  } catch (error) {
+    console.error('Punch lookup error:', error);
+    res.status(500).json({ message: 'Unable to load employee punch details' });
+  }
+});
+
+// Public kiosk punch submit by employee ID after client-side photo verification.
+router.post('/punch-kiosk', async (req, res) => {
+  const { employeeCode: rawEmployeeCode, photo, verificationScore } = req.body;
+
+  try {
+    await ensureDatabase(prisma);
+
+    const employeeCode = normalizeEmployeeCode(rawEmployeeCode);
+    const employee = await prisma.employee.findUnique({
+      where: { employeeCode },
+      select: employeePunchSelect
+    });
+
+    if (!employee || employee.status !== 'active') {
+      return res.status(404).json({ message: 'Active employee ID not found' });
+    }
+
+    if (!employee.profilePhoto) {
+      return res.status(400).json({ message: 'Profile photo is required before punching. Please contact admin.' });
+    }
+
+    if (!photo) {
+      return res.status(400).json({ message: 'Selfie photo is required' });
+    }
+
+    if (typeof verificationScore !== 'number' || verificationScore < 75) {
+      return res.status(400).json({ message: 'Selfie verification must be at least 75% before submitting.' });
+    }
+
+    const activeSession = await getOpenAttendanceSession(employee.id);
+
+    if (!activeSession) {
+      const record = await prisma.attendance.create({
+        data: {
+          employeeId: employee.id,
+          punchInTime: new Date(),
+          punchInPhoto: photo
+        }
+      });
+
+      return res.status(201).json({
+        action: 'punch-in',
+        employee: {
+          employeeCode: employee.employeeCode,
+          name: employee.name
+        },
+        record
+      });
+    }
+
+    const punchOutTime = new Date();
+    const workHours = (punchOutTime - activeSession.punchInTime) / (1000 * 60 * 60);
+    const dailyWageEarned = workHours * employee.hourlyRate;
+
+    const record = await prisma.attendance.update({
+      where: { id: activeSession.id },
+      data: {
+        punchOutTime,
+        punchOutPhoto: photo,
+        workHours,
+        dailyWageEarned
+      }
+    });
+
+    return res.json({
+      action: 'punch-out',
+      employee: {
+        employeeCode: employee.employeeCode,
+        name: employee.name
+      },
+      record
+    });
+  } catch (error) {
+    console.error('Kiosk punch error:', error);
+    res.status(500).json({ message: 'Unable to submit attendance punch' });
+  }
+});
+
 // Get all attendance records for verification (Admin only)
 router.get('/all', auth, adminOnly, async (req, res) => {
   try {

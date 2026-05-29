@@ -54,9 +54,15 @@ const HomePage = () => {
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link to="/login">
-                  <Button size="lg" className="w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
                     <LogIn className="h-5 w-5" />
                     Login
+                  </Button>
+                </Link>
+                <Link to="/punch-attendance">
+                  <Button size="lg" className="w-full sm:w-auto">
+                    <Camera className="h-5 w-5" />
+                    Punch In
                   </Button>
                 </Link>
               </div>
@@ -161,15 +167,21 @@ const HomePage = () => {
 
         <section className="px-4 py-16">
           <div className="container mx-auto max-w-4xl text-center">
-            <h2 className="text-3xl font-bold text-foreground md:text-4xl">Start with one secure login</h2>
+            <h2 className="text-3xl font-bold text-foreground md:text-4xl">Start with one secure login or quick punch</h2>
             <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-              Admin credentials open the admin dashboard. Employee credentials open the employee workspace.
+              Admin credentials open the dashboard. Employees can punch with their employee ID and selfie verification.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Link to="/login">
-                <Button size="lg" className="w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto">
                   <LogIn className="h-5 w-5" />
                   Login
+                </Button>
+              </Link>
+              <Link to="/punch-attendance">
+                <Button size="lg" className="w-full sm:w-auto">
+                  <Camera className="h-5 w-5" />
+                  Punch In
                 </Button>
               </Link>
             </div>
