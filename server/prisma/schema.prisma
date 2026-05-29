@@ -33,6 +33,7 @@ model Employee {
   governmentIdFront        String?      @map("government_id_front")
   governmentIdBack         String?      @map("government_id_back")
   bloodGroup               String?      @map("blood_group")
+  reviewRemark             String?      @map("review_remark")
   dailyWage                Float        @map("daily_wage")
   hourlyRate               Float        @map("hourly_rate")
   joiningDate              DateTime     @map("joining_date")

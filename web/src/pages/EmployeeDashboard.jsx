@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Camera, Clock, IndianRupee, Calendar, TrendingUp, User } from 'lucide-react';
+import { Camera, Clock, IndianRupee, Calendar, TrendingUp, User, MessageSquareText } from 'lucide-react';
 import { toast } from 'sonner';
 import apiClient from '@/lib/apiClient.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
@@ -12,6 +12,7 @@ import SelfieCapture from '@/components/SelfieCapture.jsx';
 
 const EmployeeDashboard = () => {
   const { currentUser } = useAuth();
+  const [employeeProfile, setEmployeeProfile] = useState(currentUser);
   const [showSelfieCapture, setShowSelfieCapture] = useState(false);
   const [currentSession, setCurrentSession] = useState(null);
   const [elapsedTime, setElapsedTime] = useState('');
@@ -24,9 +25,20 @@ const EmployeeDashboard = () => {
   });
 
   useEffect(() => {
+    loadEmployeeProfile();
     loadCurrentSession();
     loadStats();
   }, []);
+
+  const loadEmployeeProfile = async () => {
+    try {
+      const response = await apiClient.get('/employees/me');
+      setEmployeeProfile(response.data);
+    } catch (error) {
+      console.error('Error loading employee profile:', error);
+      setEmployeeProfile(currentUser);
+    }
+  };
 
   useEffect(() => {
     let interval;
@@ -124,7 +136,7 @@ const EmployeeDashboard = () => {
       <div className="branded-app-shell min-h-screen bg-background pt-14 md:pl-72 md:pt-0">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="app-page-header">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Welcome, {currentUser?.name}</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Welcome, {employeeProfile?.name}</h1>
             <p className="text-muted-foreground">Track your attendance and earnings</p>
           </div>
 
@@ -137,40 +149,49 @@ const EmployeeDashboard = () => {
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-4 pb-3">
                   <div className="h-20 w-20 overflow-hidden rounded-md border bg-muted flex items-center justify-center">
-                    {currentUser?.profilePhoto ? (
-                      <img src={currentUser.profilePhoto} alt={currentUser?.name} className="h-full w-full object-cover" />
+                    {employeeProfile?.profilePhoto ? (
+                      <img src={employeeProfile.profilePhoto} alt={employeeProfile?.name} className="h-full w-full object-cover" />
                     ) : (
                       <User className="h-8 w-8 text-muted-foreground" />
                     )}
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">{currentUser?.name}</p>
+                    <p className="font-medium text-foreground">{employeeProfile?.name}</p>
                     <p className="text-sm text-muted-foreground">Verification reference photo</p>
                   </div>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Employee ID</span>
-                  <span className="font-medium">{currentUser?.employeeCode || currentUser?.id}</span>
+                  <span className="font-medium">{employeeProfile?.employeeCode || employeeProfile?.id}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Email</span>
-                  <span className="font-medium">{currentUser?.email}</span>
+                  <span className="font-medium">{employeeProfile?.email}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Phone</span>
-                  <span className="font-medium">{currentUser?.phone || '-'}</span>
+                  <span className="font-medium">{employeeProfile?.phone || '-'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Joining Date</span>
-                  <span className="font-medium">{currentUser?.joiningDate ? new Date(currentUser?.joiningDate).toLocaleDateString() : '-'}</span>
+                  <span className="font-medium">{employeeProfile?.joiningDate ? new Date(employeeProfile?.joiningDate).toLocaleDateString() : '-'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Daily Wage</span>
-                  <span className="font-medium">Rs. {currentUser?.dailyWage?.toFixed(2)}</span>
+                  <span className="font-medium">Rs. {employeeProfile?.dailyWage?.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Hourly Rate</span>
-                  <span className="font-medium">Rs. {currentUser?.hourlyRate?.toFixed(2)}</span>
+                  <span className="font-medium">Rs. {employeeProfile?.hourlyRate?.toFixed(2)}</span>
+                </div>
+                <div className="border-t pt-4">
+                  <div className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
+                    <MessageSquareText className="h-4 w-4 text-muted-foreground" />
+                    Review & Remark
+                  </div>
+                  <p className="whitespace-pre-wrap rounded-md border bg-background p-3 text-sm leading-6 text-muted-foreground">
+                    {employeeProfile?.reviewRemark || 'No review or remark added yet.'}
+                  </p>
                 </div>
               </CardContent>
             </Card>

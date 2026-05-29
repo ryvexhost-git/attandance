@@ -21,6 +21,24 @@ router.get('/', auth, adminOnly, async (req, res) => {
   }
 });
 
+// Get current employee profile
+router.get('/me', auth, async (req, res) => {
+  try {
+    await ensureDatabase(prisma);
+
+    const employee = await prisma.employee.findUnique({ where: { id: req.user.id } });
+
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    const { password: _, loginPassword: __, ...employeeWithoutPrivateFields } = employee;
+    res.json(employeeWithoutPrivateFields);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Create employee (Admin only)
 router.post('/', auth, adminOnly, async (req, res) => {
   const {
@@ -33,6 +51,7 @@ router.post('/', auth, adminOnly, async (req, res) => {
     governmentIdFront,
     governmentIdBack,
     bloodGroup,
+    reviewRemark,
     dailyWage,
     joiningDate,
     status,
@@ -65,6 +84,7 @@ router.post('/', auth, adminOnly, async (req, res) => {
         governmentIdFront,
         governmentIdBack,
         bloodGroup,
+        reviewRemark,
         dailyWage,
         hourlyRate,
         joiningDate: parsedJoiningDate,
@@ -99,6 +119,7 @@ router.put('/:id', auth, adminOnly, async (req, res) => {
     governmentIdFront,
     governmentIdBack,
     bloodGroup,
+    reviewRemark,
     dailyWage,
     joiningDate,
     status,
@@ -121,6 +142,7 @@ router.put('/:id', auth, adminOnly, async (req, res) => {
       governmentIdFront,
       governmentIdBack,
       bloodGroup,
+      reviewRemark,
       dailyWage,
       hourlyRate: dailyWage / 8,
       joiningDate: parsedJoiningDate,

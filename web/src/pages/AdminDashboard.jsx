@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
 import { Image as ImageIcon, Upload, Users, UserPlus, Edit, Trash2, IndianRupee, TrendingUp, X } from 'lucide-react';
 import { toast } from 'sonner';
 import apiClient from '@/lib/apiClient.js';
@@ -33,6 +34,7 @@ const AdminDashboard = () => {
     governmentIdFront: '',
     governmentIdBack: '',
     bloodGroup: '',
+    reviewRemark: '',
     dailyWage: '',
     joiningDate: '',
     status: 'active',
@@ -232,6 +234,7 @@ const AdminDashboard = () => {
       governmentIdFront: employee.governmentIdFront || '',
       governmentIdBack: employee.governmentIdBack || '',
       bloodGroup: employee.bloodGroup || '',
+      reviewRemark: employee.reviewRemark || '',
       dailyWage: employee.dailyWage.toString(),
       joiningDate: employee.joiningDate ? employee.joiningDate.split('T')[0] : '',
       status: employee.status,
@@ -254,6 +257,7 @@ const AdminDashboard = () => {
       governmentIdFront: '',
       governmentIdBack: '',
       bloodGroup: '',
+      reviewRemark: '',
       dailyWage: '',
       joiningDate: '',
       status: 'active',
@@ -276,6 +280,7 @@ const AdminDashboard = () => {
       governmentIdFront: '',
       governmentIdBack: '',
       bloodGroup: '',
+      reviewRemark: '',
       dailyWage: '',
       joiningDate: '',
       status: 'active',
@@ -355,9 +360,9 @@ const AdminDashboard = () => {
                       </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-                      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6">
-                        <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-                          <div className="grid gap-6 md:grid-cols-2">
+                      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
+                        <div className="grid items-start gap-5 lg:grid-cols-[1fr_320px]">
+                          <div className="grid content-start gap-x-6 gap-y-4 md:grid-cols-2">
                             <div className="space-y-2">
                         <Label htmlFor="employeeCode">TCB-ID</Label>
                         <Input
@@ -491,6 +496,17 @@ const AdminDashboard = () => {
                             ? 'Optional. Changing this overrides the TCB-ID based password.'
                             : 'Leave blank. The password is created from the 4-digit TCB-ID number.'}
                         </p>
+                      </div>
+                            <div className="space-y-2 md:col-span-2">
+                        <Label htmlFor="reviewRemark">Review & Remark</Label>
+                        <Textarea
+                          id="reviewRemark"
+                          value={formData.reviewRemark}
+                          onChange={(e) => setFormData({ ...formData, reviewRemark: e.target.value })}
+                          className="min-h-32 text-foreground"
+                          placeholder="Enter admin review notes or remarks for this employee"
+                        />
+                        <p className="text-xs text-muted-foreground">Visible to the employee, editable only by admin.</p>
                       </div>
                           </div>
 

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { CalendarDays, Droplets, GraduationCap, IdCard, IndianRupee, Image as ImageIcon, Mail, MapPin, Phone, Search, UserRound } from 'lucide-react';
+import { CalendarDays, Droplets, GraduationCap, IdCard, IndianRupee, Image as ImageIcon, Mail, MapPin, MessageSquareText, Phone, Search, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import Header from '@/components/Header.jsx';
 import apiClient from '@/lib/apiClient.js';
@@ -229,6 +229,15 @@ const AdminEmployees = () => {
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                       <DocumentImage label="Government ID Front" src={selectedEmployee.governmentIdFront} />
                       <DocumentImage label="Government ID Back" src={selectedEmployee.governmentIdBack} />
+                    </div>
+                    <div className="mt-6 rounded-md border bg-background p-5">
+                      <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        <MessageSquareText className="h-4 w-4" />
+                        Review & Remark
+                      </div>
+                      <p className="whitespace-pre-wrap text-sm leading-6 text-foreground">
+                        {selectedEmployee.reviewRemark || 'No review or remark added yet.'}
+                      </p>
                     </div>
                   </CardContent>
                 </>
