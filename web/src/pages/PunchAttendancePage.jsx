@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
-import { AlertCircle, Camera, Check, Clock, IdCard, RotateCcw, Search, User } from 'lucide-react';
+import { AlertCircle, Camera, Check, Clock, IdCard, RotateCcw, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import Header from '@/components/Header.jsx';
 import { Button } from '@/components/ui/button';
@@ -183,7 +183,7 @@ const PunchAttendancePage = () => {
       </Helmet>
       <Header />
       <main className="branded-app-shell min-h-screen bg-background px-4 py-10">
-        <div className="container mx-auto grid max-w-6xl gap-8 lg:grid-cols-[380px_1fr]">
+        <div className={`container mx-auto grid gap-8 ${punchDetails ? 'max-w-6xl lg:grid-cols-[380px_1fr]' : 'max-w-lg'}`}>
           <Card className="h-fit">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -231,6 +231,7 @@ const PunchAttendancePage = () => {
             </CardContent>
           </Card>
 
+          {punchDetails && (
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -243,12 +244,7 @@ const PunchAttendancePage = () => {
               <CardContent className="grid gap-6 lg:grid-cols-[1fr_280px]">
                 <div className="space-y-4">
                   <div className="relative aspect-video overflow-hidden rounded-lg border bg-muted">
-                    {!punchDetails ? (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-muted-foreground">
-                        <IdCard className="mb-3 h-10 w-10 opacity-40" />
-                        <p>Enter employee ID to open the camera.</p>
-                      </div>
-                    ) : cameraError ? (
+                    {cameraError ? (
                       <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
                         <AlertCircle className="mb-3 h-10 w-10 text-destructive" />
                         <p className="text-sm font-medium text-destructive">{cameraError}</p>
@@ -365,16 +361,8 @@ const PunchAttendancePage = () => {
                 </CardContent>
               </Card>
             )}
-
-            {!punchDetails && (
-              <Card className="border-dashed">
-                <CardContent className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
-                  <User className="mb-3 h-10 w-10 opacity-40" />
-                  <p className="max-w-md">Use the employee ID shown in the admin employee table. The system will decide punch-in or punch-out automatically.</p>
-                </CardContent>
-              </Card>
-            )}
           </div>
+          )}
         </div>
       </main>
     </>
