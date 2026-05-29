@@ -21,6 +21,7 @@ const AdminDashboard = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [formData, setFormData] = useState({
+    employeeCode: '',
     name: '',
     email: '',
     phone: '',
@@ -30,6 +31,20 @@ const AdminDashboard = () => {
     password: '',
     profilePhoto: ''
   });
+
+  const getNextEmployeeCode = () => {
+    const usedNumbers = employees
+      .map((employee) => Number(/^TCB-(\d{4})$/.exec(employee.employeeCode || '')?.[1]))
+      .filter(Number.isInteger);
+    const nextNumber = Math.max(2025, ...usedNumbers) + 1;
+
+    return `TCB-${nextNumber}`;
+  };
+
+  const normalizeEmployeeCodeInput = (value) => {
+    const digits = value.replace(/\D/g, '').slice(0, 4);
+    return digits ? `TCB-${digits}` : 'TCB-';
+  };
 
   useEffect(() => {
     loadEmployees();
@@ -98,12 +113,8 @@ const AdminDashboard = () => {
         await apiClient.put(`/employees/${editingEmployee.id}`, data);
         toast.success('Employee updated successfully');
       } else {
-        const password = formData.password || Math.random().toString(36).slice(-8);
-        await apiClient.post('/employees', {
-          ...data,
-          password: password
-        });
-        toast.success(`Employee created. Password: ${password}`);
+        const response = await apiClient.post('/employees', data);
+        toast.success(`Employee created. Password: ${response.data.loginPassword}`);
       }
 
       setDialogOpen(false);
@@ -184,6 +195,7 @@ const AdminDashboard = () => {
   const openEditDialog = (employee) => {
     setEditingEmployee(employee);
     setFormData({
+      employeeCode: employee.employeeCode || '',
       name: employee.name,
       email: employee.email,
       phone: employee.phone || '',
@@ -196,9 +208,26 @@ const AdminDashboard = () => {
     setDialogOpen(true);
   };
 
+  const openAddDialog = () => {
+    setEditingEmployee(null);
+    setFormData({
+      employeeCode: getNextEmployeeCode(),
+      name: '',
+      email: '',
+      phone: '',
+      dailyWage: '',
+      joiningDate: '',
+      status: 'active',
+      password: '',
+      profilePhoto: ''
+    });
+    setDialogOpen(true);
+  };
+
   const resetForm = () => {
     setEditingEmployee(null);
     setFormData({
+      employeeCode: '',
       name: '',
       email: '',
       phone: '',
@@ -266,7 +295,7 @@ const AdminDashboard = () => {
                   if (!open) resetForm();
                 }}>
                   <DialogTrigger asChild>
-                    <Button>
+                    <Button onClick={openAddDialog}>
                       <UserPlus className="h-4 w-4 mr-2" />
                       Add Employee
                     </Button>
@@ -284,6 +313,17 @@ const AdminDashboard = () => {
                       <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6">
                         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
                           <div className="grid gap-6 md:grid-cols-2">
+                            <div className="space-y-2">
+                        <Label htmlFor="employeeCode">TCB-ID</Label>
+                        <Input
+                          id="employeeCode"
+                          value={formData.employeeCode}
+                          onChange={(e) => setFormData({ ...formData, employeeCode: normalizeEmployeeCodeInput(e.target.value) })}
+                          required
+                          className="text-foreground"
+                        />
+                        <p className="text-xs text-muted-foreground">Must start with TCB-. New employees use the 4-digit number as their password.</p>
+                      </div>
                             <div className="space-y-2">
                         <Label htmlFor="name">Name</Label>
                         <Input
@@ -355,12 +395,16 @@ const AdminDashboard = () => {
                         <Label htmlFor="password">Password {editingEmployee && '(leave blank to keep current)'}</Label>
                         <Input
                           id="password"
-                          type="password"
+                          type="text"
                           value={formData.password}
                           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                          required={!editingEmployee}
                           className="text-foreground"
                         />
+                        <p className="text-xs text-muted-foreground">
+                          {editingEmployee
+                            ? 'Optional. Changing this overrides the TCB-ID based password.'
+                            : 'Leave blank. The password is created from the 4-digit TCB-ID number.'}
+                        </p>
                       </div>
                           </div>
 
@@ -427,7 +471,7 @@ const AdminDashboard = () => {
                 <div className="text-center py-8">
                   <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <p className="text-muted-foreground mb-4">No employees yet</p>
-                  <Button onClick={() => setDialogOpen(true)}>
+                  <Button onClick={openAddDialog}>
                     <UserPlus className="h-4 w-4 mr-2" />
                     Add First Employee
                   </Button>
@@ -439,6 +483,7 @@ const AdminDashboard = () => {
                       <TableRow>
                         <TableHead>Name</TableHead>
                         <TableHead>Employee ID</TableHead>
+                        <TableHead>Password</TableHead>
                         <TableHead>Photo</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Phone</TableHead>
@@ -454,6 +499,7 @@ const AdminDashboard = () => {
                           <TableCell>
                             <Badge variant="secondary">{employee.employeeCode || '-'}</Badge>
                           </TableCell>
+                          <TableCell className="font-mono">{employee.loginPassword || '-'}</TableCell>
                           <TableCell>
                             <div className="h-10 w-10 overflow-hidden rounded-md border bg-muted flex items-center justify-center">
                               {employee.profilePhoto ? (

@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const { PrismaClient } = require('@prisma/client');
 const { auth, adminOnly } = require('../middleware/auth');
-const { ensureDatabase, generateEmployeeCode } = require('../lib/ensureDatabase');
+const { ensureDatabase, formatEmployeeCode, generateEmployeeCode, getEmployeeCodePassword } = require('../lib/ensureDatabase');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -23,16 +23,19 @@ router.get('/', auth, adminOnly, async (req, res) => {
 
 // Create employee (Admin only)
 router.post('/', auth, adminOnly, async (req, res) => {
-  const { name, email, password, phone, dailyWage, joiningDate, status, profilePhoto } = req.body;
+  const { name, email, phone, dailyWage, joiningDate, status, profilePhoto } = req.body;
 
   try {
     await ensureDatabase(prisma);
 
+    const employeeCode = req.body.employeeCode
+      ? formatEmployeeCode(req.body.employeeCode)
+      : await generateEmployeeCode(prisma);
+    const loginPassword = getEmployeeCodePassword(employeeCode);
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(loginPassword, salt);
     const hourlyRate = dailyWage / 8;
     const parsedJoiningDate = new Date(joiningDate);
-    const employeeCode = await generateEmployeeCode(prisma, parsedJoiningDate);
 
     const employee = await prisma.employee.create({
       data: {
@@ -40,6 +43,7 @@ router.post('/', auth, adminOnly, async (req, res) => {
         name,
         email,
         password: hashedPassword,
+        loginPassword,
         phone,
         dailyWage,
         hourlyRate,
@@ -53,7 +57,11 @@ router.post('/', auth, adminOnly, async (req, res) => {
     res.status(201).json(employeeWithoutPassword);
   } catch (error) {
     if (error.code === 'P2002') {
-      return res.status(400).json({ message: 'Email already exists' });
+      const field = error.meta?.target?.includes('employee_code') ? 'TCB-ID' : 'Email';
+      return res.status(400).json({ message: `${field} already exists` });
+    }
+    if (/^TCB-ID/.test(error.message || '')) {
+      return res.status(400).json({ message: error.message });
     }
     res.status(500).json({ message: 'Server error' });
   }
@@ -79,13 +87,19 @@ router.put('/:id', auth, adminOnly, async (req, res) => {
       profilePhoto
     };
 
-    if (existingEmployee && existingEmployee.joiningDate.toISOString().split('T')[0] !== joiningDate) {
-      updateData.employeeCode = await generateEmployeeCode(prisma, parsedJoiningDate);
+    if (req.body.employeeCode) {
+      updateData.employeeCode = formatEmployeeCode(req.body.employeeCode);
     }
 
     if (password) {
       const salt = await bcrypt.genSalt(10);
       updateData.password = await bcrypt.hash(password, salt);
+      updateData.loginPassword = password;
+    } else if (updateData.employeeCode && updateData.employeeCode !== existingEmployee?.employeeCode) {
+      const loginPassword = getEmployeeCodePassword(updateData.employeeCode);
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(loginPassword, salt);
+      updateData.loginPassword = loginPassword;
     }
 
     const employee = await prisma.employee.update({
@@ -96,6 +110,13 @@ router.put('/:id', auth, adminOnly, async (req, res) => {
     const { password: _, ...employeeWithoutPassword } = employee;
     res.json(employeeWithoutPassword);
   } catch (error) {
+    if (error.code === 'P2002') {
+      const field = error.meta?.target?.includes('employee_code') ? 'TCB-ID' : 'Email';
+      return res.status(400).json({ message: `${field} already exists` });
+    }
+    if (/^TCB-ID/.test(error.message || '')) {
+      return res.status(400).json({ message: error.message });
+    }
     res.status(500).json({ message: 'Server error' });
   }
 });

@@ -40,6 +40,7 @@ async function initializeDatabase(prisma) {
       "employee_code" TEXT,
       "email" TEXT NOT NULL,
       "password" TEXT NOT NULL,
+      "login_password" TEXT,
       "name" TEXT NOT NULL,
       "phone" TEXT,
       "daily_wage" DOUBLE PRECISION NOT NULL,
@@ -72,8 +73,10 @@ async function initializeDatabase(prisma) {
   await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "Admin_email_key" ON "Admin"("email");');
   await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "Employee_email_key" ON "Employee"("email");');
   await prisma.$executeRawUnsafe('ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "employee_code" TEXT;');
+  await prisma.$executeRawUnsafe('ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "login_password" TEXT;');
   await backfillEmployeeCodes(prisma);
   await prisma.$executeRawUnsafe('CREATE UNIQUE INDEX IF NOT EXISTS "Employee_employee_code_key" ON "Employee"("employee_code");');
+  await backfillEmployeeLoginPasswords(prisma);
   await prisma.$executeRawUnsafe('ALTER TABLE "Employee" ADD COLUMN IF NOT EXISTS "profile_photo" TEXT;');
 
   await prisma.$executeRawUnsafe(`
@@ -100,40 +103,100 @@ async function backfillEmployeeCodes(prisma) {
   });
 
   for (const employee of employees) {
-    const employeeCode = await generateEmployeeCode(prisma, employee.joiningDate);
+    const employeeCode = await generateEmployeeCode(prisma, employee.id);
+    const loginPassword = getEmployeeCodePassword(employeeCode);
     await prisma.employee.update({
       where: { id: employee.id },
-      data: { employeeCode },
+      data: {
+        employeeCode,
+        loginPassword,
+        password: await bcrypt.hash(loginPassword, await bcrypt.genSalt(10)),
+      },
     });
   }
 }
 
-function formatJoiningDateCode(joiningDate) {
-  const date = new Date(joiningDate);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = String(date.getFullYear()).slice(-2);
-
-  return `${day}${month}${year}`;
-}
-
-async function generateEmployeeCode(prisma, joiningDate) {
-  const prefix = `TCB${formatJoiningDateCode(joiningDate)}`;
-  const employeesForDate = await prisma.employee.findMany({
+async function backfillEmployeeLoginPasswords(prisma) {
+  const employees = await prisma.employee.findMany({
     where: {
+      loginPassword: null,
       employeeCode: {
-        startsWith: prefix,
+        startsWith: 'TCB-',
       },
     },
+    select: { id: true, employeeCode: true },
+  });
+
+  for (const employee of employees) {
+    const employeeNumber = parseTcbEmployeeNumber(employee.employeeCode);
+
+    if (!Number.isInteger(employeeNumber)) {
+      continue;
+    }
+
+    const loginPassword = getEmployeeCodePassword(employee.employeeCode);
+    await prisma.employee.update({
+      where: { id: employee.id },
+      data: {
+        loginPassword,
+        password: await bcrypt.hash(loginPassword, await bcrypt.genSalt(10)),
+      },
+    });
+  }
+}
+
+async function generateEmployeeCode(prisma, ignoredEmployeeId) {
+  const prefix = 'TCB-';
+  const where = {
+    employeeCode: {
+      startsWith: prefix,
+    },
+  };
+
+  if (ignoredEmployeeId) {
+    where.id = { not: ignoredEmployeeId };
+  }
+
+  const employees = await prisma.employee.findMany({
+    where,
     select: { employeeCode: true },
   });
-  const usedNumbers = employeesForDate
-    .map((employee) => Number(employee.employeeCode?.slice(prefix.length)))
+
+  const usedNumbers = employees
+    .map((employee) => parseTcbEmployeeNumber(employee.employeeCode))
     .filter(Number.isInteger);
 
-  const nextNumber = Math.max(2, ...usedNumbers) + 1;
+  const nextNumber = Math.max(2025, ...usedNumbers) + 1;
 
-  return `${prefix}${String(nextNumber).padStart(2, '0')}`;
+  return formatEmployeeCode(nextNumber);
+}
+
+function parseTcbEmployeeNumber(employeeCode) {
+  const match = /^TCB-(\d{4})$/.exec(employeeCode || '');
+  return match ? Number(match[1]) : NaN;
+}
+
+function formatEmployeeCode(value) {
+  const digits = String(value || '').replace(/\D/g, '');
+  if (digits.length !== 4) {
+    throw new Error('TCB-ID must include a 4 digit number.');
+  }
+
+  if (Number(digits) < 2026) {
+    throw new Error('TCB-ID number must start from 2026.');
+  }
+
+  return `TCB-${digits}`;
+}
+
+function getEmployeeCodePassword(employeeCode) {
+  const employeeNumber = parseTcbEmployeeNumber(employeeCode);
+
+  if (!Number.isInteger(employeeNumber)) {
+    throw new Error('TCB-ID must use the format TCB-2026.');
+  }
+
+  return String(employeeNumber);
 }
 
 async function ensureAdmin(prisma) {
@@ -155,4 +218,4 @@ async function ensureAdmin(prisma) {
   });
 }
 
-module.exports = { ensureDatabase, generateEmployeeCode };
+module.exports = { ensureDatabase, formatEmployeeCode, generateEmployeeCode, getEmployeeCodePassword };

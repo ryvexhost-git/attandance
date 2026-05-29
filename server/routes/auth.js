@@ -74,7 +74,7 @@ const sendLoginResponse = (res, user, role) => {
     { expiresIn: '24h' }
   );
 
-  const { password: _, ...userWithoutPassword } = user;
+  const { password: _, loginPassword: __, ...userWithoutPassword } = user;
   return res.json({
     token,
     user: { ...userWithoutPassword, role }

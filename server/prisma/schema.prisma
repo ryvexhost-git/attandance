@@ -24,6 +24,7 @@ model Employee {
   employeeCode  String?      @unique @map("employee_code")
   email         String       @unique
   password      String
+  loginPassword String?      @map("login_password")
   name          String
   phone         String?
   dailyWage     Float        @map("daily_wage")
