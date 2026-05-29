@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const { PrismaClient } = require('@prisma/client');
+const { ensureDatabase } = require('./lib/ensureDatabase');
 
 dotenv.config();
 
@@ -35,7 +36,7 @@ app.get('/api/health/db', async (req, res) => {
       throw new Error('DATABASE_URL must start with postgresql:// or postgres://.');
     }
 
-    await prisma.$queryRaw`SELECT 1`;
+    await ensureDatabase(prisma);
     const adminCount = await prisma.admin.count();
     res.json({
       ok: true,
