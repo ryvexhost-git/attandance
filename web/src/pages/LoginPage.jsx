@@ -20,7 +20,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(userRole === 'admin' ? '/admin-dashboard' : '/employee-dashboard');
+      navigate(userRole === 'admin' ? '/admin-dashboard' : '/punch-attendance');
     }
   }, [isAuthenticated, userRole, navigate]);
 
@@ -32,7 +32,7 @@ const LoginPage = () => {
     try {
       const result = await login(email, password);
       if (result.success) {
-        navigate(result.role === 'admin' ? '/admin-dashboard' : '/employee-dashboard');
+        navigate(result.role === 'admin' ? '/admin-dashboard' : '/punch-attendance');
       }
     } catch (err) {
       setError(err.message);
@@ -76,7 +76,7 @@ const LoginPage = () => {
           <Card className="glass-panel w-full max-w-md justify-self-center rounded-lg">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">Welcome back</CardTitle>
-              <CardDescription>Use your admin or employee credentials</CardDescription>
+              <CardDescription>Admin and manager access only</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">

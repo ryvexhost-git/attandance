@@ -17,10 +17,22 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     
     if (savedUser && token) {
-      const user = JSON.parse(savedUser);
-      setCurrentUser(user);
-      setUserRole(user.role);
-      setIsAuthenticated(true);
+      try {
+        const user = JSON.parse(savedUser);
+
+        if (user?.role) {
+          setCurrentUser(user);
+          setUserRole(user.role);
+          setIsAuthenticated(true);
+        } else {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
+      } catch (error) {
+        console.warn('Clearing invalid saved login session:', error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
     }
     setInitialLoading(false);
   }, []);

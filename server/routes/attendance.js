@@ -27,6 +27,22 @@ const getOpenAttendanceSession = (employeeId) => prisma.attendance.findFirst({
 
 const normalizeEmployeeCode = (employeeCode = '') => employeeCode.trim().toUpperCase();
 
+const getPeriodStarts = () => {
+  const now = new Date();
+  const todayStart = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
+
+  const weekStart = new Date(todayStart);
+  weekStart.setDate(todayStart.getDate() - todayStart.getDay());
+
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  return { todayStart, weekStart, monthStart };
+};
+
+const recordHours = (record) => record.workHours || 0;
+const recordWage = (record) => record.dailyWageEarned || 0;
+
 const findVerifiedPunchEmployee = async (rawEmployeeCode, rawPassword) => {
   const employeeCode = normalizeEmployeeCode(rawEmployeeCode);
   const password = String(rawPassword || '');
@@ -157,6 +173,113 @@ router.post('/punch-kiosk', async (req, res) => {
   } catch (error) {
     console.error('Kiosk punch error:', error);
     res.status(500).json({ message: 'Unable to submit attendance punch' });
+  }
+});
+
+// Admin payroll, attendance, and kiosk health summary
+router.get('/admin-summary', auth, adminOnly, async (req, res) => {
+  try {
+    await ensureDatabase(prisma);
+
+    const { todayStart, weekStart, monthStart } = getPeriodStarts();
+
+    const [employees, records] = await Promise.all([
+      prisma.employee.findMany({
+        orderBy: { name: 'asc' },
+        select: {
+          id: true,
+          employeeCode: true,
+          name: true,
+          email: true,
+          phone: true,
+          status: true,
+          profilePhoto: true,
+          dailyWage: true,
+          hourlyRate: true
+        }
+      }),
+      prisma.attendance.findMany({
+        include: {
+          employee: {
+            select: {
+              id: true,
+              employeeCode: true,
+              name: true,
+              email: true,
+              status: true,
+              profilePhoto: true,
+              dailyWage: true,
+              hourlyRate: true
+            }
+          }
+        },
+        orderBy: { punchInTime: 'desc' },
+        take: 500
+      })
+    ]);
+
+    const activeEmployees = employees.filter((employee) => employee.status === 'active');
+    const todayRecords = records.filter((record) => record.punchInTime >= todayStart);
+    const weekRecords = records.filter((record) => record.punchInTime >= weekStart);
+    const monthRecords = records.filter((record) => record.punchInTime >= monthStart);
+    const activeSessions = records.filter((record) => !record.punchOutTime);
+    const todayEmployeeIds = new Set(todayRecords.map((record) => record.employeeId));
+    const absentToday = activeEmployees.filter((employee) => !todayEmployeeIds.has(employee.id));
+    const missingPhotos = activeEmployees.filter((employee) => !employee.profilePhoto);
+
+    const employeePayroll = employees.map((employee) => {
+      const employeeRecords = records.filter((record) => record.employeeId === employee.id);
+      const employeeTodayRecords = employeeRecords.filter((record) => record.punchInTime >= todayStart);
+      const employeeWeekRecords = employeeRecords.filter((record) => record.punchInTime >= weekStart);
+      const employeeMonthRecords = employeeRecords.filter((record) => record.punchInTime >= monthStart);
+      const activeSession = employeeRecords.find((record) => !record.punchOutTime);
+
+      return {
+        id: employee.id,
+        employeeCode: employee.employeeCode,
+        name: employee.name,
+        status: employee.status,
+        dailyWage: employee.dailyWage,
+        hourlyRate: employee.hourlyRate,
+        todayHours: employeeTodayRecords.reduce((sum, record) => sum + recordHours(record), 0),
+        weekHours: employeeWeekRecords.reduce((sum, record) => sum + recordHours(record), 0),
+        monthHours: employeeMonthRecords.reduce((sum, record) => sum + recordHours(record), 0),
+        todayPayroll: employeeTodayRecords.reduce((sum, record) => sum + recordWage(record), 0),
+        weekPayroll: employeeWeekRecords.reduce((sum, record) => sum + recordWage(record), 0),
+        monthPayroll: employeeMonthRecords.reduce((sum, record) => sum + recordWage(record), 0),
+        activeSession: activeSession
+          ? {
+            id: activeSession.id,
+            punchInTime: activeSession.punchInTime
+          }
+          : null,
+        lastPunchInTime: employeeRecords[0]?.punchInTime || null
+      };
+    });
+
+    res.json({
+      stats: {
+        totalEmployees: employees.length,
+        activeEmployees: activeEmployees.length,
+        activeSessions: activeSessions.length,
+        absentToday: absentToday.length,
+        missingPhotos: missingPhotos.length,
+        todayHours: todayRecords.reduce((sum, record) => sum + recordHours(record), 0),
+        weekHours: weekRecords.reduce((sum, record) => sum + recordHours(record), 0),
+        monthHours: monthRecords.reduce((sum, record) => sum + recordHours(record), 0),
+        todayPayroll: todayRecords.reduce((sum, record) => sum + recordWage(record), 0),
+        weekPayroll: weekRecords.reduce((sum, record) => sum + recordWage(record), 0),
+        monthPayroll: monthRecords.reduce((sum, record) => sum + recordWage(record), 0)
+      },
+      employeePayroll,
+      activeSessions,
+      absentToday,
+      missingPhotos,
+      recentAttendance: records.slice(0, 75)
+    });
+  } catch (error) {
+    console.error('Admin attendance summary error:', error);
+    res.status(500).json({ message: 'Unable to load admin attendance summary' });
   }
 });
 

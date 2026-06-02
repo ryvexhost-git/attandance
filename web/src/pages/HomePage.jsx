@@ -96,7 +96,7 @@ const HomePage = () => {
               <div>
                 <h2 className="text-3xl font-bold text-foreground md:text-4xl">Everything needed for daily attendance</h2>
                 <p className="mt-3 max-w-2xl text-muted-foreground">
-                  Focused screens for administrators and employees, with fewer clicks and clearer records.
+                  A focused admin console for managers and a simple punch window for staff attendance.
                 </p>
               </div>
             </div>
@@ -154,12 +154,12 @@ const HomePage = () => {
                 <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-md bg-primary text-primary-foreground">
                   <TrendingUp className="h-5 w-5" />
                 </div>
-                <CardTitle>For employees</CardTitle>
-                <CardDescription>Simple punch flow, visible hours, and transparent earnings.</CardDescription>
+                <CardTitle>For staff punch-in</CardTitle>
+                <CardDescription>Employees mark attendance through the punch window, without a dashboard login.</CardDescription>
               </CardHeader>
               <CardContent className="grid gap-3 text-sm text-muted-foreground">
-                <p>Punch in and out with a guided selfie verification workflow.</p>
-                <p>See today, weekly, and monthly wage summaries without confusion.</p>
+                <p>Punch in and out with employee ID, password, and guided selfie verification.</p>
+                <p>Admins and managers review attendance, photos, hours, and payroll from the dashboard.</p>
               </CardContent>
             </Card>
           </div>
@@ -167,9 +167,9 @@ const HomePage = () => {
 
         <section className="px-4 py-16">
           <div className="container mx-auto max-w-4xl text-center">
-            <h2 className="text-3xl font-bold text-foreground md:text-4xl">Start with one secure login or quick punch</h2>
+            <h2 className="text-3xl font-bold text-foreground md:text-4xl">Admin login, employee punch-in</h2>
             <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-              Admin credentials open the dashboard. Employees can punch with their employee ID and selfie verification.
+              Admin and manager credentials open the dashboard. Employees use the punch window with their TCB-ID and selfie verification.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Link to="/login">

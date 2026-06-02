@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Camera, Menu, LogOut, User, LayoutDashboard, Clock, IndianRupee, ChevronDown, Users } from 'lucide-react';
+import { Camera, Menu, LogOut, User, LayoutDashboard, Users } from 'lucide-react';
 
 const BrandLogo = ({ className = 'h-8 w-8' }) => (
   <img src="/logo-tcb.png" alt="Coffee Bun" className={`${className} object-contain`} />
@@ -20,13 +20,7 @@ const Header = () => {
     { to: '/admin-employees', label: 'Employees', icon: Users }
   ];
 
-  const employeeLinks = [
-    { to: '/employee-dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/attendance-records', label: 'Attendance', icon: Clock },
-    { to: '/payroll-summary', label: 'Payroll', icon: IndianRupee }
-  ];
-
-  const links = userRole === 'admin' ? adminLinks : userRole === 'employee' ? employeeLinks : [];
+  const links = userRole === 'admin' ? adminLinks : [];
 
   const NavLinks = ({ mobile = false }) => (
     <>
@@ -83,36 +77,6 @@ const Header = () => {
         <div className="space-y-1">
           <NavLinks mobile={mobile} />
         </div>
-
-        {userRole === 'employee' && (
-          <div className="mt-6">
-            <div className="mb-2 flex items-center justify-between px-3 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-              <span>Work</span>
-              <ChevronDown className="h-4 w-4" />
-            </div>
-            <div className="space-y-1">
-              {employeeLinks.slice(1).map((link) => {
-                const Icon = link.icon;
-                const isActive = location.pathname === link.to;
-                return (
-                  <Link
-                    key={`sub-${link.to}`}
-                    to={link.to}
-                    onClick={() => mobile && setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-                      isActive
-                        ? 'bg-white/10 text-white'
-                        : 'text-zinc-400 hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        )}
       </nav>
 
       <div className="border-t border-white/10 p-3">

@@ -10,9 +10,6 @@ import LoginPage from '@/pages/LoginPage.jsx';
 import PunchAttendancePage from '@/pages/PunchAttendancePage.jsx';
 import AdminDashboard from '@/pages/AdminDashboard.jsx';
 import AdminEmployees from '@/pages/AdminEmployees.jsx';
-import EmployeeDashboard from '@/pages/EmployeeDashboard.jsx';
-import AttendanceRecords from '@/pages/AttendanceRecords.jsx';
-import PayrollSummary from '@/pages/PayrollSummary.jsx';
 
 function App() {
   return (
@@ -39,30 +36,9 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/employee-dashboard"
-            element={
-              <ProtectedRoute requiredRole="employee">
-                <EmployeeDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/attendance-records"
-            element={
-              <ProtectedRoute requiredRole="employee">
-                <AttendanceRecords />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/payroll-summary"
-            element={
-              <ProtectedRoute requiredRole="employee">
-                <PayrollSummary />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/employee-dashboard" element={<PunchAttendancePage />} />
+          <Route path="/attendance-records" element={<PunchAttendancePage />} />
+          <Route path="/payroll-summary" element={<PunchAttendancePage />} />
           <Route
             path="*"
             element={

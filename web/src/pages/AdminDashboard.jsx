@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,17 +10,34 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Image as ImageIcon, Upload, Users, UserPlus, Edit, Trash2, IndianRupee, TrendingUp, X } from 'lucide-react';
+import { AlertTriangle, CalendarCheck, Camera, Clock, Image as ImageIcon, Upload, Users, UserPlus, Edit, Trash2, IndianRupee, TrendingUp, X } from 'lucide-react';
 import { toast } from 'sonner';
 import apiClient from '@/lib/apiClient.js';
 import Header from '@/components/Header.jsx';
 
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
+const formatMoney = (value = 0) => `Rs. ${Number(value || 0).toFixed(2)}`;
+const formatHours = (value = 0) => `${Number(value || 0).toFixed(1)}h`;
+const formatDateTime = (value) => value ? new Date(value).toLocaleString() : '-';
+
 const AdminDashboard = () => {
   const [employees, setEmployees] = useState([]);
   const [recentAttendance, setRecentAttendance] = useState([]);
-  const [stats, setStats] = useState({ total: 0, active: 0, totalPayroll: 0 });
+  const [payrollRows, setPayrollRows] = useState([]);
+  const [dashboardStats, setDashboardStats] = useState({
+    totalEmployees: 0,
+    activeEmployees: 0,
+    activeSessions: 0,
+    absentToday: 0,
+    missingPhotos: 0,
+    todayHours: 0,
+    weekHours: 0,
+    monthHours: 0,
+    todayPayroll: 0,
+    weekPayroll: 0,
+    monthPayroll: 0
+  });
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
@@ -57,49 +75,27 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    loadEmployees();
-    loadStats();
-    loadRecentAttendance();
+    loadDashboardData();
   }, []);
 
-  const loadEmployees = async () => {
+  const loadDashboardData = async () => {
+    setLoading(true);
+
     try {
-      const response = await apiClient.get('/employees');
-      setEmployees(response.data);
+      const [employeesResponse, summaryResponse] = await Promise.all([
+        apiClient.get('/employees'),
+        apiClient.get('/attendance/admin-summary')
+      ]);
+
+      setEmployees(employeesResponse.data);
+      setRecentAttendance(summaryResponse.data.recentAttendance || []);
+      setPayrollRows(summaryResponse.data.employeePayroll || []);
+      setDashboardStats(summaryResponse.data.stats || {});
     } catch (error) {
-      console.error('Error loading employees:', error);
-      toast.error('Failed to load employees');
+      console.error('Error loading dashboard:', error);
+      toast.error('Failed to load dashboard data');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const loadStats = async () => {
-    try {
-      // In a real app, you might have a dedicated stats endpoint
-      // For now, we calculate from the employees list
-      const response = await apiClient.get('/employees');
-      const allEmployees = response.data;
-      const activeEmployees = allEmployees.filter(emp => emp.status === 'active');
-
-      // Note: totalPayroll calculation would ideally be done on the server
-      // This is a placeholder since we don't have a global attendance list yet
-      setStats({
-        total: allEmployees.length,
-        active: activeEmployees.length,
-        totalPayroll: 0 // Placeholder
-      });
-    } catch (error) {
-      console.error('Error loading stats:', error);
-    }
-  };
-
-  const loadRecentAttendance = async () => {
-    try {
-      const response = await apiClient.get('/attendance/all');
-      setRecentAttendance(response.data);
-    } catch (error) {
-      console.error('Error loading attendance verification:', error);
     }
   };
 
@@ -129,9 +125,7 @@ const AdminDashboard = () => {
 
       setDialogOpen(false);
       resetForm();
-      loadEmployees();
-      loadStats();
-      loadRecentAttendance();
+      loadDashboardData();
     } catch (error) {
       console.error('Error saving employee:', error);
       toast.error(error.response?.data?.message || 'Failed to save employee');
@@ -212,9 +206,7 @@ const AdminDashboard = () => {
     try {
       await apiClient.delete(`/employees/${id}`);
       toast.success('Employee deleted');
-      loadEmployees();
-      loadStats();
-      loadRecentAttendance();
+      loadDashboardData();
     } catch (error) {
       console.error('Error deleting employee:', error);
       toast.error('Failed to delete employee');
@@ -300,38 +292,160 @@ const AdminDashboard = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="app-page-header">
             <h1 className="text-3xl font-bold text-foreground mb-2">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Manage employees and track payroll</p>
+            <p className="text-muted-foreground">Manage employees, monitor punches, and control payroll from one place.</p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3 mb-8">
+          <div className="mb-8 flex flex-col gap-3 sm:flex-row">
+            <Link to="/punch-attendance">
+              <Button className="w-full sm:w-auto">
+                <Camera className="h-4 w-4 mr-2" />
+                Open Punch Window
+              </Button>
+            </Link>
+            <Button variant="outline" className="w-full sm:w-auto" onClick={loadDashboardData} disabled={loading}>
+              <Clock className="h-4 w-4 mr-2" />
+              Refresh Dashboard
+            </Button>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5 mb-8">
             <Card className="brand-visual-card metric-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.total}</div>
+                <div className="text-2xl font-bold">{dashboardStats.totalEmployees}</div>
+                <p className="text-xs text-muted-foreground mt-1">{dashboardStats.activeEmployees} active</p>
               </CardContent>
             </Card>
             <Card className="brand-visual-card metric-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Active Employees</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium">Active Sessions</CardTitle>
+                <Clock className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.active}</div>
+                <div className="text-2xl font-bold">{dashboardStats.activeSessions}</div>
+                <p className="text-xs text-muted-foreground mt-1">Currently punched in</p>
+              </CardContent>
+            </Card>
+            <Card className="brand-visual-card metric-card">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">Today Payroll</CardTitle>
+                <IndianRupee className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{formatMoney(dashboardStats.todayPayroll)}</div>
+                <p className="text-xs text-muted-foreground mt-1">{formatHours(dashboardStats.todayHours)} today</p>
               </CardContent>
             </Card>
             <Card className="brand-visual-card metric-card">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Monthly Payroll</CardTitle>
-                <IndianRupee className="h-4 w-4 text-muted-foreground" />
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">Rs. {stats.totalPayroll.toFixed(2)}</div>
+                <div className="text-2xl font-bold">{formatMoney(dashboardStats.monthPayroll)}</div>
+                <p className="text-xs text-muted-foreground mt-1">{formatHours(dashboardStats.monthHours)} this month</p>
+              </CardContent>
+            </Card>
+            <Card className="brand-visual-card metric-card">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">Action Needed</CardTitle>
+                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{dashboardStats.absentToday}</div>
+                <p className="text-xs text-muted-foreground mt-1">{dashboardStats.missingPhotos} missing photos</p>
               </CardContent>
             </Card>
           </div>
+
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Admin Payroll Overview</CardTitle>
+              <CardDescription>Payroll and attendance totals are calculated from employee punch records.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-3 mb-6">
+                <div className="rounded-md border bg-muted/30 p-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <IndianRupee className="h-4 w-4 text-primary" />
+                    Weekly Payroll
+                  </div>
+                  <p className="mt-2 text-2xl font-bold text-foreground">{formatMoney(dashboardStats.weekPayroll)}</p>
+                  <p className="text-xs text-muted-foreground">{formatHours(dashboardStats.weekHours)} this week</p>
+                </div>
+                <div className="rounded-md border bg-muted/30 p-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <CalendarCheck className="h-4 w-4 text-primary" />
+                    Present Today
+                  </div>
+                  <p className="mt-2 text-2xl font-bold text-foreground">
+                    {Math.max((dashboardStats.activeEmployees || 0) - (dashboardStats.absentToday || 0), 0)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{dashboardStats.absentToday} absent today</p>
+                </div>
+                <div className="rounded-md border bg-muted/30 p-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <Camera className="h-4 w-4 text-primary" />
+                    Kiosk Readiness
+                  </div>
+                  <p className="mt-2 text-2xl font-bold text-foreground">
+                    {Math.max((dashboardStats.activeEmployees || 0) - (dashboardStats.missingPhotos || 0), 0)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{dashboardStats.missingPhotos} employees need reference photos</p>
+                </div>
+              </div>
+
+              {payrollRows.length === 0 ? (
+                <p className="py-8 text-center text-muted-foreground">No payroll records yet</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Employee</TableHead>
+                        <TableHead>Today</TableHead>
+                        <TableHead>This Week</TableHead>
+                        <TableHead>This Month</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Last Punch</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {payrollRows.map((row) => (
+                        <TableRow key={row.id}>
+                          <TableCell>
+                            <div className="font-medium">{row.name}</div>
+                            <div className="text-xs text-muted-foreground">{row.employeeCode}</div>
+                          </TableCell>
+                          <TableCell>
+                            <div>{formatMoney(row.todayPayroll)}</div>
+                            <div className="text-xs text-muted-foreground">{formatHours(row.todayHours)}</div>
+                          </TableCell>
+                          <TableCell>
+                            <div>{formatMoney(row.weekPayroll)}</div>
+                            <div className="text-xs text-muted-foreground">{formatHours(row.weekHours)}</div>
+                          </TableCell>
+                          <TableCell>
+                            <div>{formatMoney(row.monthPayroll)}</div>
+                            <div className="text-xs text-muted-foreground">{formatHours(row.monthHours)}</div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={row.activeSession ? 'default' : row.status === 'active' ? 'secondary' : 'outline'}>
+                              {row.activeSession ? 'Working' : row.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{formatDateTime(row.lastPunchInTime)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           <Card>
             <CardHeader>

@@ -18,12 +18,7 @@ router.post('/login', async (req, res) => {
       return sendLoginResponse(res, admin, 'admin');
     }
 
-    const employee = await prisma.employee.findUnique({ where: { email } });
-    if (employee && await bcrypt.compare(password, employee.password)) {
-      return sendLoginResponse(res, employee, 'employee');
-    }
-
-    return res.status(401).json({ message: 'Invalid email or password' });
+    return res.status(401).json({ message: 'Invalid admin or manager credentials' });
   } catch (error) {
     console.error('Login error:', error);
     const operationalError = getLoginOperationalError(error);
