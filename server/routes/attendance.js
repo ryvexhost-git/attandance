@@ -42,6 +42,7 @@ const getPeriodStarts = () => {
 
 const recordHours = (record) => record.workHours || 0;
 const recordWage = (record) => record.dailyWageEarned || 0;
+const money = (value) => Number(value || 0);
 
 const findVerifiedPunchEmployee = async (rawEmployeeCode, rawPassword) => {
   const employeeCode = normalizeEmployeeCode(rawEmployeeCode);
@@ -195,7 +196,9 @@ router.get('/admin-summary', auth, adminOnly, async (req, res) => {
           status: true,
           profilePhoto: true,
           dailyWage: true,
-          hourlyRate: true
+          hourlyRate: true,
+          payrollPaidAmount: true,
+          payrollReceivedAmount: true
         }
       }),
       prisma.attendance.findMany({
@@ -233,6 +236,10 @@ router.get('/admin-summary', auth, adminOnly, async (req, res) => {
       const employeeWeekRecords = employeeRecords.filter((record) => record.punchInTime >= weekStart);
       const employeeMonthRecords = employeeRecords.filter((record) => record.punchInTime >= monthStart);
       const activeSession = employeeRecords.find((record) => !record.punchOutTime);
+      const monthPayroll = employeeMonthRecords.reduce((sum, record) => sum + recordWage(record), 0);
+      const paidAmount = money(employee.payrollPaidAmount);
+      const receivedAmount = money(employee.payrollReceivedAmount);
+      const balanceToPay = Math.max(monthPayroll - paidAmount - receivedAmount, 0);
 
       return {
         id: employee.id,
@@ -241,12 +248,15 @@ router.get('/admin-summary', auth, adminOnly, async (req, res) => {
         status: employee.status,
         dailyWage: employee.dailyWage,
         hourlyRate: employee.hourlyRate,
+        payrollPaidAmount: paidAmount,
+        payrollReceivedAmount: receivedAmount,
+        balanceToPay,
         todayHours: employeeTodayRecords.reduce((sum, record) => sum + recordHours(record), 0),
         weekHours: employeeWeekRecords.reduce((sum, record) => sum + recordHours(record), 0),
         monthHours: employeeMonthRecords.reduce((sum, record) => sum + recordHours(record), 0),
         todayPayroll: employeeTodayRecords.reduce((sum, record) => sum + recordWage(record), 0),
         weekPayroll: employeeWeekRecords.reduce((sum, record) => sum + recordWage(record), 0),
-        monthPayroll: employeeMonthRecords.reduce((sum, record) => sum + recordWage(record), 0),
+        monthPayroll,
         activeSession: activeSession
           ? {
             id: activeSession.id,
@@ -256,6 +266,10 @@ router.get('/admin-summary', auth, adminOnly, async (req, res) => {
         lastPunchInTime: employeeRecords[0]?.punchInTime || null
       };
     });
+    const totalPayrollDue = employeePayroll.reduce((sum, employee) => sum + employee.monthPayroll, 0);
+    const totalPaid = employeePayroll.reduce((sum, employee) => sum + employee.payrollPaidAmount, 0);
+    const totalReceived = employeePayroll.reduce((sum, employee) => sum + employee.payrollReceivedAmount, 0);
+    const balanceToPay = employeePayroll.reduce((sum, employee) => sum + employee.balanceToPay, 0);
 
     res.json({
       stats: {
@@ -269,7 +283,11 @@ router.get('/admin-summary', auth, adminOnly, async (req, res) => {
         monthHours: monthRecords.reduce((sum, record) => sum + recordHours(record), 0),
         todayPayroll: todayRecords.reduce((sum, record) => sum + recordWage(record), 0),
         weekPayroll: weekRecords.reduce((sum, record) => sum + recordWage(record), 0),
-        monthPayroll: monthRecords.reduce((sum, record) => sum + recordWage(record), 0)
+        monthPayroll: monthRecords.reduce((sum, record) => sum + recordWage(record), 0),
+        totalPayrollDue,
+        totalPaid,
+        totalReceived,
+        balanceToPay
       },
       employeePayroll,
       activeSessions,

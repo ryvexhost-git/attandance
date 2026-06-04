@@ -26,6 +26,11 @@ const validateRequiredCreateFields = ({ employeeCode, name, phone, dailyWage }) 
   return null;
 };
 
+const toMoneyNumber = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
 // Get all employees (Admin only)
 router.get('/', auth, adminOnly, async (req, res) => {
   try {
@@ -71,6 +76,8 @@ router.post('/', auth, adminOnly, async (req, res) => {
     governmentIdBack,
     bloodGroup,
     reviewRemark,
+    payrollPaidAmount,
+    payrollReceivedAmount,
     dailyWage,
     joiningDate,
     status,
@@ -113,6 +120,8 @@ router.post('/', auth, adminOnly, async (req, res) => {
         governmentIdBack,
         bloodGroup,
         reviewRemark,
+        payrollPaidAmount: toMoneyNumber(payrollPaidAmount),
+        payrollReceivedAmount: toMoneyNumber(payrollReceivedAmount),
         dailyWage,
         hourlyRate,
         joiningDate: parsedJoiningDate,
@@ -148,6 +157,8 @@ router.put('/:id', auth, adminOnly, async (req, res) => {
     governmentIdBack,
     bloodGroup,
     reviewRemark,
+    payrollPaidAmount,
+    payrollReceivedAmount,
     dailyWage,
     joiningDate,
     status,
@@ -171,6 +182,8 @@ router.put('/:id', auth, adminOnly, async (req, res) => {
       governmentIdBack,
       bloodGroup,
       reviewRemark,
+      payrollPaidAmount: toMoneyNumber(payrollPaidAmount),
+      payrollReceivedAmount: toMoneyNumber(payrollReceivedAmount),
       dailyWage,
       hourlyRate: dailyWage / 8,
       joiningDate: parsedJoiningDate,

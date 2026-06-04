@@ -36,7 +36,11 @@ const AdminDashboard = () => {
     monthHours: 0,
     todayPayroll: 0,
     weekPayroll: 0,
-    monthPayroll: 0
+    monthPayroll: 0,
+    totalPayrollDue: 0,
+    totalPaid: 0,
+    totalReceived: 0,
+    balanceToPay: 0
   });
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -53,6 +57,8 @@ const AdminDashboard = () => {
     governmentIdBack: '',
     bloodGroup: '',
     reviewRemark: '',
+    payrollPaidAmount: '',
+    payrollReceivedAmount: '',
     dailyWage: '',
     joiningDate: '',
     status: 'active',
@@ -112,7 +118,9 @@ const AdminDashboard = () => {
     try {
       const data = {
         ...formData,
-        dailyWage: parseFloat(formData.dailyWage)
+        dailyWage: parseFloat(formData.dailyWage),
+        payrollPaidAmount: parseFloat(formData.payrollPaidAmount || '0'),
+        payrollReceivedAmount: parseFloat(formData.payrollReceivedAmount || '0')
       };
 
       if (editingEmployee) {
@@ -227,6 +235,8 @@ const AdminDashboard = () => {
       governmentIdBack: employee.governmentIdBack || '',
       bloodGroup: employee.bloodGroup || '',
       reviewRemark: employee.reviewRemark || '',
+      payrollPaidAmount: String(employee.payrollPaidAmount || 0),
+      payrollReceivedAmount: String(employee.payrollReceivedAmount || 0),
       dailyWage: employee.dailyWage.toString(),
       joiningDate: employee.joiningDate ? employee.joiningDate.split('T')[0] : '',
       status: employee.status,
@@ -250,6 +260,8 @@ const AdminDashboard = () => {
       governmentIdBack: '',
       bloodGroup: '',
       reviewRemark: '',
+      payrollPaidAmount: '0',
+      payrollReceivedAmount: '0',
       dailyWage: '',
       joiningDate: '',
       status: 'active',
@@ -273,6 +285,8 @@ const AdminDashboard = () => {
       governmentIdBack: '',
       bloodGroup: '',
       reviewRemark: '',
+      payrollPaidAmount: '',
+      payrollReceivedAmount: '',
       dailyWage: '',
       joiningDate: '',
       status: 'active',
@@ -367,6 +381,41 @@ const AdminDashboard = () => {
               <CardDescription>Payroll and attendance totals are calculated from employee punch records.</CardDescription>
             </CardHeader>
             <CardContent>
+              <div className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div className="rounded-md border bg-muted/30 p-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <IndianRupee className="h-4 w-4 text-primary" />
+                    Total Payable
+                  </div>
+                  <p className="mt-2 text-2xl font-bold text-foreground">{formatMoney(dashboardStats.totalPayrollDue)}</p>
+                  <p className="text-xs text-muted-foreground">Current month payable</p>
+                </div>
+                <div className="rounded-md border bg-muted/30 p-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <IndianRupee className="h-4 w-4 text-primary" />
+                    Amount Paid
+                  </div>
+                  <p className="mt-2 text-2xl font-bold text-foreground">{formatMoney(dashboardStats.totalPaid)}</p>
+                  <p className="text-xs text-muted-foreground">Marked paid by admin</p>
+                </div>
+                <div className="rounded-md border bg-muted/30 p-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <IndianRupee className="h-4 w-4 text-primary" />
+                    Amount Received
+                  </div>
+                  <p className="mt-2 text-2xl font-bold text-foreground">{formatMoney(dashboardStats.totalReceived)}</p>
+                  <p className="text-xs text-muted-foreground">Confirmed as received</p>
+                </div>
+                <div className="rounded-md border bg-muted/30 p-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <AlertTriangle className="h-4 w-4 text-primary" />
+                    Amount To Pay
+                  </div>
+                  <p className="mt-2 text-2xl font-bold text-foreground">{formatMoney(dashboardStats.balanceToPay)}</p>
+                  <p className="text-xs text-muted-foreground">Remaining payroll balance</p>
+                </div>
+              </div>
+
               <div className="grid gap-4 md:grid-cols-3 mb-6">
                 <div className="rounded-md border bg-muted/30 p-4">
                   <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
@@ -409,6 +458,9 @@ const AdminDashboard = () => {
                         <TableHead>Today</TableHead>
                         <TableHead>This Week</TableHead>
                         <TableHead>This Month</TableHead>
+                        <TableHead>Paid</TableHead>
+                        <TableHead>Received</TableHead>
+                        <TableHead>To Pay</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Last Punch</TableHead>
                       </TableRow>
@@ -432,6 +484,9 @@ const AdminDashboard = () => {
                             <div>{formatMoney(row.monthPayroll)}</div>
                             <div className="text-xs text-muted-foreground">{formatHours(row.monthHours)}</div>
                           </TableCell>
+                          <TableCell>{formatMoney(row.payrollPaidAmount)}</TableCell>
+                          <TableCell>{formatMoney(row.payrollReceivedAmount)}</TableCell>
+                          <TableCell className="font-semibold">{formatMoney(row.balanceToPay)}</TableCell>
                           <TableCell>
                             <Badge variant={row.activeSession ? 'default' : row.status === 'active' ? 'secondary' : 'outline'}>
                               {row.activeSession ? 'Working' : row.status}
@@ -573,6 +628,32 @@ const AdminDashboard = () => {
                           className="text-foreground"
                         />
                         <p className="text-xs text-muted-foreground">Hourly rate will be calculated as daily wage / 8</p>
+                      </div>
+                            <div className="space-y-2">
+                        <Label htmlFor="payrollPaidAmount">Amount Paid (Rs.)</Label>
+                        <Input
+                          id="payrollPaidAmount"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.payrollPaidAmount}
+                          onChange={(e) => setFormData({ ...formData, payrollPaidAmount: e.target.value })}
+                          required
+                          className="text-foreground"
+                        />
+                      </div>
+                            <div className="space-y-2">
+                        <Label htmlFor="payrollReceivedAmount">Amount Received (Rs.)</Label>
+                        <Input
+                          id="payrollReceivedAmount"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.payrollReceivedAmount}
+                          onChange={(e) => setFormData({ ...formData, payrollReceivedAmount: e.target.value })}
+                          required
+                          className="text-foreground"
+                        />
                       </div>
                             <div className="space-y-2">
                         <Label htmlFor="joiningDate">Joining Date</Label>
@@ -843,9 +924,12 @@ const AdminDashboard = () => {
                       <TableRow>
                         <TableHead>Employee</TableHead>
                         <TableHead>Reference</TableHead>
-                        <TableHead>Punch In</TableHead>
-                        <TableHead>Punch Out</TableHead>
-                        <TableHead>Date</TableHead>
+                        <TableHead>Punch In Photo</TableHead>
+                        <TableHead>Punch Out Photo</TableHead>
+                        <TableHead>Punch In Date & Time</TableHead>
+                        <TableHead>Punch Out Date & Time</TableHead>
+                        <TableHead>Work Hours</TableHead>
+                        <TableHead>Wage Earned</TableHead>
                         <TableHead>Status</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -883,7 +967,10 @@ const AdminDashboard = () => {
                               '-'
                             )}
                           </TableCell>
-                          <TableCell>{new Date(record.punchInTime).toLocaleString()}</TableCell>
+                          <TableCell>{formatDateTime(record.punchInTime)}</TableCell>
+                          <TableCell>{formatDateTime(record.punchOutTime)}</TableCell>
+                          <TableCell>{record.workHours ? formatHours(record.workHours) : '-'}</TableCell>
+                          <TableCell>{formatMoney(record.dailyWageEarned)}</TableCell>
                           <TableCell>
                             <Badge variant={record.punchOutTime ? 'default' : 'secondary'}>
                               {record.punchOutTime ? 'Completed' : 'Active'}
