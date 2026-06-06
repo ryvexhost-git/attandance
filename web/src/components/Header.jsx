@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Camera, Menu, LogOut, User, LayoutDashboard, Users } from 'lucide-react';
+import { Camera, Menu, LogOut, User, LayoutDashboard, IndianRupee, Users } from 'lucide-react';
 
 const BrandLogo = ({ className = 'h-8 w-8' }) => (
   <img src="/logo-tcb.png" alt="Coffee Bun" className={`${className} object-contain`} />
@@ -17,7 +17,8 @@ const Header = () => {
 
   const adminLinks = [
     { to: '/admin-dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/admin-employees', label: 'Employees', icon: Users }
+    { to: '/admin-employees', label: 'Employees', icon: Users },
+    { to: '/admin-payroll', label: 'Payroll', icon: IndianRupee }
   ];
 
   const links = userRole === 'admin' ? adminLinks : [];

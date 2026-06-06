@@ -10,6 +10,7 @@ import LoginPage from '@/pages/LoginPage.jsx';
 import PunchAttendancePage from '@/pages/PunchAttendancePage.jsx';
 import AdminDashboard from '@/pages/AdminDashboard.jsx';
 import AdminEmployees from '@/pages/AdminEmployees.jsx';
+import AdminPayroll from '@/pages/AdminPayroll.jsx';
 
 function App() {
   return (
@@ -33,6 +34,14 @@ function App() {
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminEmployees />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin-payroll"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminPayroll />
               </ProtectedRoute>
             }
           />
